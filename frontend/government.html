@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schemes & News | AgriSathi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="assets/js/translations.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+            background-attachment: fixed;
+        }
+
+        .agri-green {
+            background-color: #3ea847;
+        }
+
+        .agri-dark {
+            background-color: #1f5425;
+        }
+
+        .agri-text {
+            color: #1f5425;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background-color: #3ea847;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .scheme-card,
+        .news-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .scheme-card:hover,
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-subsidy {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-loan {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-insurance {
+            background-color: #fce7f3;
+            color: #9f1239;
+        }
+
+        .badge-training {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .badge-tech {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .card-hover {
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden lg:flex flex-col w-72 h-screen agri-dark text-white fixed left-0 top-0 z-50">
+        <div class="p-6 border-b border-white/10 flex items-center space-x-3">
+            <span class="text-3xl">🌾</span>
+            <span class="text-2xl font-black tracking-tight" data-i18n="app_name">AgriSathi</span>
+        </div>
+        <nav class="flex-grow p-4 mt-4 space-y-2">
+            <a href="index.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors"><i
+                    class="fas fa-th-large w-6"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+            <a href="assistant.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors"><i
+                    class="fas fa-robot w-6"></i><span data-i18n="nav_assistant">AI Assistant</span></a>
+            <a href="crop.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors"><i
+                    class="fas fa-leaf w-6"></i><span data-i18n="nav_crop">Crop Advisor</span></a>
+            <a href="government.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl bg-white/10 border-l-4 border-green-400 font-bold"><i
+                    class="fas fa-landmark w-6"></i><span data-i18n="nav_govt">Schemes & News</span></a>
+            <a href="saved.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors"><i
+                    class="fas fa-bookmark w-6"></i><span data-i18n="nav_saved">Saved Advice</span></a>
+            <a href="profile.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors"><i
+                    class="fas fa-user w-6"></i><span data-i18n="nav_profile">Profile</span></a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-grow lg:ml-72 flex flex-col min-h-screen">
+        <!-- Top Bar -->
+        <header
+            class="glass-card border-b border-white/50 flex items-center justify-between px-6 py-4 sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="lg:hidden text-gray-500 text-xl"><i class="fas fa-arrow-left"></i></a>
+                <h1 class="text-xl font-black agri-text" data-i18n="nav_govt">Schemes & News</h1>
+            </div>
+            <div class="flex items-center space-x-3">
+                <select id="lang-select" onchange="setLanguage(this.value)"
+                    class="bg-gray-100 px-3 py-2 rounded-xl text-xs font-bold agri-text outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="ml">മലയാളം</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto">
+
+            <!-- Search & Filter Section -->
+            <div class="glass rounded-3xl p-6 shadow-lg border border-white/50">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="lg:col-span-1 relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="search-input" placeholder="Search districts or crops..."
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 focus:border-green-400 outline-none text-sm font-bold bg-white"
+                            oninput="performSearch()">
+                    </div>
+                    <select id="state-select"
+                        class="px-4 py-4 rounded-2xl border border-gray-200 focus:border-green-400 outline-none text-sm font-bold bg-white"
+                        onchange="performSearch()">
+                        <option value="">All Regions</option>
+                        <option value="kerala">Kerala</option>
+                        <option value="tamilnadu">Tamil Nadu</option>
+                        <option value="all-india">All India (Central)</option>
+                    </select>
+                    <select id="district-select"
+                        class="px-4 py-4 rounded-2xl border border-gray-200 focus:border-green-400 outline-none text-sm font-bold bg-white"
+                        onchange="performSearch()">
+                        <option value="">All Districts</option>
+                        <option value="kanchipuram">Kanchipuram</option>
+                        <option value="wayanad">Wayanad</option>
+                        <option value="palakkad">Palakkad</option>
+                        <option value="alappuzha">Alappuzha</option>
+                        <option value="kozhingode">Kozhikode</option>
+                        <option value="kannur">Kannur</option>
+                        <option value="thiruvallur">Thiruvallur</option>
+                    </select>
+                    <select id="crop-select"
+                        class="px-4 py-4 rounded-2xl border border-gray-200 focus:border-green-400 outline-none text-sm font-bold bg-white"
+                        onchange="performSearch()">
+                        <option value="">All Crops</option>
+                        <option value="paddy">Paddy / Rice</option>
+                        <option value="coconut">Coconut</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="pepper">Black Pepper</option>
+                        <option value="banana">Banana</option>
+                    </select>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterCategory('all')"
+                        class="filter-btn active px-4 py-2 rounded-full text-xs font-bold bg-gray-100 transition-all">All</button>
+                    <button onclick="filterCategory('subsidy')"
+                        class="filter-btn px-4 py-2 rounded-full text-xs font-bold bg-gray-100 transition-all">💰
+                        Subsidies</button>
+                    <button onclick="filterCategory('loan')"
+                        class="filter-btn px-4 py-2 rounded-full text-xs font-bold bg-gray-100 transition-all">🏦
+                        Loans</button>
+                    <button onclick="filterCategory('insurance')"
+                        class="filter-btn px-4 py-2 rounded-full text-xs font-bold bg-gray-100 transition-all">🛡️
+                        Insurance</button>
+                    <button onclick="filterCategory('training')"
+                        class="filter-btn px-4 py-2 rounded-full text-xs font-bold bg-gray-100 transition-all">📚
+                        Training</button>
+                    <button onclick="filterCategory('equipment')"
+                        class="filter-btn px-4 py-2 rounded-full text-xs font-bold bg-gray-100 transition-all">🚜
+                        Equipment</button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass rounded-2xl p-4 text-center border border-green-100">
+                    <p class="text-2xl font-black text-green-600" id="total-schemes">0</p>
+                    <p class="text-xs font-bold text-gray-500">Active Schemes</p>
+                </div>
+                <div class="glass rounded-2xl p-4 text-center border border-blue-100">
+                    <p class="text-2xl font-black text-blue-600" id="total-news">0</p>
+                    <p class="text-xs font-bold text-gray-500">Latest News</p>
+                </div>
+                <div class="glass rounded-2xl p-4 text-center border border-yellow-100">
+                    <p class="text-2xl font-black text-yellow-600">₹5L+</p>
+                    <p class="text-xs font-bold text-gray-500">Max Subsidy</p>
+                </div>
+                <div class="glass rounded-2xl p-4 text-center border border-purple-100">
+                    <p class="text-2xl font-black text-purple-600">12</p>
+                    <p class="text-xs font-bold text-gray-500">States Covered</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+                <!-- Schemes Panel -->
+                <section class="space-y-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-12 h-12 agri-green text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-hand-holding-usd text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-black agri-text">Government Schemes</h2>
+                                <p class="text-xs text-gray-500">Subsidies, Loans & Support Programs</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="schemes-list" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                        <!-- Loading -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 animate-pulse">
+                            <div class="w-2/3 h-4 bg-gray-100 rounded mb-4"></div>
+                            <div class="w-full h-10 bg-gray-50 rounded"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- News Panel -->
+                <section class="space-y-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-newspaper text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-black agri-text">Agricultural News</h2>
+                                <p class="text-xs text-gray-500">Latest updates & announcements</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="news-list" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                        <!-- Loading -->
+                        <div class="bg-white p-4 rounded-3xl shadow-sm flex items-center space-x-4 animate-pulse">
+                            <div class="w-16 h-16 bg-gray-100 rounded-2xl"></div>
+                            <div class="flex-grow space-y-2">
+                                <div class="w-full h-3 bg-gray-100 rounded"></div>
+                                <div class="w-1/2 h-2 bg-gray-100 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- News Detail Modal -->
+        <div id="news-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden overflow-y-auto">
+            <div class="min-h-screen flex items-center justify-center p-4">
+                <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl relative overflow-hidden">
+                    <button onclick="closeNewsModal()"
+                        class="absolute right-8 top-8 w-12 h-12 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-lg z-10 transition-all hover:scale-110">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+
+                    <div class="p-10 lg:p-14">
+                        <div class="mb-6">
+                            <div id="modal-news-icon"
+                                class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl mb-4 shadow-lg">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <span id="modal-news-category"
+                                class="text-xs font-black uppercase px-3 py-1 rounded-full bg-green-50 text-green-600"></span>
+                            <span id="modal-news-date" class="text-xs font-bold text-gray-400 ml-2"></span>
+                        </div>
+
+                        <h2 id="modal-news-title" class="text-3xl font-black agri-text mb-6 leading-tight"></h2>
+
+                        <p id="modal-news-content" class="text-base text-gray-700 leading-relaxed mb-8"></p>
+
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                            <a id="modal-news-link" href="#" target="_blank"
+                                class="flex items-center space-x-2 text-sm font-black text-blue-600 hover:text-blue-800 transition-colors">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Visit Official Source</span>
+                            </a>
+                            <button onclick="closeNewsModal()"
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-bold transition-all">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8001";
+        let allSchemes = [];
+        let allNews = [];
+        let currentCategory = 'all';
+
+        // Comprehensive Schemes Data
+        const schemesData = [
+            // Central Government Schemes
+            { id: 1, name: "PM-KISAN", fullName: "Pradhan Mantri Kisan Samman Nidhi", description: "₹6,000 per year direct income support to all farmer families across India, paid in 3 equal installments.", amount: "₹6,000/year", category: "subsidy", status: "Active", state: "all-india", link: "https://pmkisan.gov.in/", eligibility: "All land-holding farmers", deadline: "Ongoing" },
+            { id: 2, name: "PM Fasal Bima Yojana", fullName: "Pradhan Mantri Fasal Bima Yojana", description: "Crop insurance scheme with premium as low as 2% for Kharif, 1.5% for Rabi crops. Covers natural calamities, pests and diseases.", amount: "Premium: 1.5-5%", category: "insurance", status: "Active", state: "all-india", link: "https://pmfby.gov.in/", eligibility: "All farmers", deadline: "Seasonal" },
+            { id: 3, name: "Kisan Credit Card", fullName: "Kisan Credit Card Scheme", description: "Short-term credit for crop production with interest subvention. Credit limit up to ₹3 lakh at 4% interest after subvention.", amount: "Up to ₹3 Lakh", category: "loan", status: "Active", state: "all-india", link: "https://www.nabard.org/", eligibility: "All farmers, tenant farmers, sharecroppers", deadline: "Ongoing" },
+            { id: 4, name: "PM Krishi Sinchai Yojana", fullName: "Pradhan Mantri Krishi Sinchayee Yojana", description: "Subsidies for micro-irrigation (drip & sprinkler). Up to 55% subsidy for small farmers, 45% for others.", amount: "45-55% Subsidy", category: "equipment", status: "Active", state: "all-india", link: "https://pmksy.gov.in/", eligibility: "All farmers", deadline: "Ongoing" },
+            { id: 5, name: "Soil Health Card", fullName: "Soil Health Card Scheme", description: "Free soil testing and health card with recommendations for fertilizers based on soil nutrient status.", amount: "Free", category: "training", status: "Active", state: "all-india", link: "https://soilhealth.dac.gov.in/", eligibility: "All farmers", deadline: "Ongoing" },
+            { id: 6, name: "e-NAM", fullName: "National Agriculture Market", description: "Online trading platform for agricultural commodities. Transparent price discovery and eliminates middlemen.", amount: "Free Registration", category: "subsidy", status: "Active", state: "all-india", link: "https://enam.gov.in/", eligibility: "All farmers with produce", deadline: "Ongoing" },
+
+            // Kerala Schemes
+            { id: 7, name: "Subhiksha Keralam", fullName: "Subhiksha Keralam Programme", description: "Self-sufficiency in vegetables with 75% subsidy on seeds, fertilizers and implements for vegetable cultivation.", amount: "75% Subsidy", category: "subsidy", status: "Active", state: "kerala", link: "https://keralaagriculture.gov.in/", eligibility: "Kerala farmers", deadline: "2025" },
+            { id: 8, name: "RKVY", fullName: "Rashtriya Krishi Vikas Yojana - Kerala", description: "Support for farm mechanization, post-harvest infrastructure with grants up to ₹5 lakhs.", amount: "Up to ₹5 Lakh", category: "equipment", status: "Active", state: "kerala", link: "https://rkvy.nic.in/", eligibility: "Kerala farmer groups", deadline: "March 2025" },
+            { id: 9, name: "Coconut Development Board", fullName: "Coconut Development Board Subsidy", description: "Replanting and rejuvenation of coconut gardens. ₹40 per palm for 4 years.", amount: "₹40/palm/year", category: "subsidy", status: "Active", state: "kerala", link: "https://coconutboard.gov.in/", eligibility: "Coconut farmers", deadline: "Ongoing" },
+
+            // Tamil Nadu Schemes
+            { id: 10, name: "Tamil Nadu CM Insurance", fullName: "Chief Minister's Crop Insurance", description: "Premium-free crop insurance for all major crops in Tamil Nadu. 100% state-funded coverage.", amount: "Free Premium", category: "insurance", status: "Active", state: "tamilnadu", link: "https://agri.tn.gov.in/", eligibility: "TN farmers only", deadline: "Seasonal" },
+            { id: 11, name: "Free Electricity", fullName: "Free Electricity for Agriculture", description: "Free electricity for agricultural pumpsets in Tamil Nadu. Unlimited units for farming operations.", amount: "Free", category: "subsidy", status: "Active", state: "tamilnadu", link: "https://agri.tn.gov.in/", eligibility: "TN farmers with pumpsets", deadline: "Ongoing" },
+            { id: 12, name: "TN Agri Mechanization", fullName: "Tamil Nadu Agricultural Mechanization", description: "50% subsidy on tractors, power tillers and farm equipment for small and marginal farmers.", amount: "50% Subsidy", category: "equipment", status: "Active", state: "tamilnadu", link: "https://agri.tn.gov.in/", eligibility: "Small & marginal farmers", deadline: "2025" },
+
+            // Karnataka Schemes  
+            { id: 13, name: "Raitha Siri", fullName: "Raitha Siri Scheme", description: "Interest-free crop loans up to ₹3 lakh for Karnataka farmers. Complete interest subvention by state.", amount: "0% Interest Loan", category: "loan", status: "Active", state: "karnataka", link: "https://raitamitra.karnataka.gov.in/", eligibility: "Karnataka farmers", deadline: "Ongoing" },
+            { id: 14, name: "Krishi Bhagya", fullName: "Krishi Bhagya Scheme", description: "Farm ponds and polyhouse construction with 80% subsidy. Water harvesting and protected cultivation.", amount: "80% Subsidy", category: "equipment", status: "Active", state: "karnataka", link: "https://raitamitra.karnataka.gov.in/", eligibility: "Dry-land farmers", deadline: "2025" },
+
+            // Andhra Pradesh
+            { id: 15, name: "YSR Rythu Bharosa", fullName: "YSR Rythu Bharosa - PM Kisan", description: "₹13,500 per year (₹7,500 state + ₹6,000 PM-KISAN) direct support to AP farmers.", amount: "₹13,500/year", category: "subsidy", status: "Active", state: "andhrapradesh", link: "https://ysrrythubharosa.ap.gov.in/", eligibility: "AP farmers only", deadline: "Ongoing" },
+            { id: 16, name: "Free Bore Wells", fullName: "YSR Free Bore Wells", description: "Free bore well drilling for farmers without irrigation source. Complete cost borne by government.", amount: "Free", category: "equipment", status: "Active", state: "andhrapradesh", link: "https://apwrims.ap.gov.in/", eligibility: "Dry-land farmers in AP", deadline: "Ongoing" },
+        ];
+
+        // News Data
+        const newsData = [
+            {
+                id: 1,
+                title: "PM-KISAN 16th Installment Released - ₹21,000 Crore Transferred",
+                date: "Dec 2024",
+                state: "all-india",
+                category: "subsidy",
+                content: "The Government of India has released the 16th installment of PM-KISAN scheme, transferring ₹21,000 crore directly to the bank accounts of over 10 crore farmer families. Each eligible farmer receives ₹2,000 in this installment. The scheme provides ₹6,000 per year in three equal installments to all landholding farmer families across the country.",
+                url: "https://pmkisan.gov.in/"
+            },
+            {
+                id: 2,
+                title: "MSP for Kharif Crops 2024-25 Announced - Paddy MSP at ₹2,300/quintal",
+                date: "Dec 2024",
+                state: "all-india",
+                category: "subsidy",
+                content: "The Cabinet Committee on Economic Affairs has approved the Minimum Support Price (MSP) for Kharif crops 2024-25. Paddy (common grade) MSP is set at ₹2,300 per quintal, while Grade A paddy will be procured at ₹2,320 per quintal. This represents an increase of ₹117 per quintal over the previous year.",
+                url: "https://agricoop.nic.in/"
+            },
+            {
+                id: 3,
+                title: "Fasal Bima Claims Simplified - New Mobile App Launched",
+                date: "Dec 2024",
+                state: "all-india",
+                category: "insurance",
+                content: "The Agriculture Ministry has launched a new mobile application to simplify crop insurance claims under PM Fasal Bima Yojana. Farmers can now submit claims, upload crop damage photos, and track claim status directly from their smartphones. The app supports multiple languages including Hindi, English, Tamil, Telugu, and Malayalam.",
+                url: "https://pmfby.gov.in/"
+            },
+            {
+                id: 4,
+                title: "Kerala: ₹500 Crore Package for Flood-Affected Farmers",
+                date: "Dec 2024",
+                state: "kerala",
+                category: "subsidy",
+                content: "The Kerala Government has announced a special relief package of ₹500 crore for farmers affected by recent floods. The package includes immediate financial assistance of ₹25,000 per hectare for crop loss, subsidized seeds and fertilizers, and interest-free loans for farm rehabilitation. Over 50,000 farmers are expected to benefit from this scheme.",
+                url: "https://keralaagriculture.gov.in/"
+            },
+            {
+                id: 5,
+                title: "Subhiksha Keralam Crosses 10 Lakh Farmer Enrollment",
+                date: "Nov 2024",
+                state: "kerala",
+                category: "subsidy",
+                content: "Kerala's flagship Subhiksha Keralam programme has successfully enrolled over 10 lakh farmers for vegetable self-sufficiency. The programme provides 75% subsidy on seeds, organic fertilizers, and farming implements. The state aims to achieve complete self-sufficiency in vegetable production by 2025.",
+                url: "https://keralaagriculture.gov.in/"
+            },
+            {
+                id: 6,
+                title: "Tamil Nadu Waives ₹12,000 Crore Farm Loans",
+                date: "Dec 2024",
+                state: "tamilnadu",
+                category: "loan",
+                content: "The Tamil Nadu Government has announced a complete waiver of farm loans up to ₹2 lakh, benefiting over 16 lakh farmers. The total waiver amount is ₹12,000 crore. This is in addition to the existing interest-free crop loans scheme. The waiver covers loans taken from cooperative banks and primary agricultural credit societies.",
+                url: "https://agri.tn.gov.in/"
+            },
+            {
+                id: 7,
+                title: "Free Electricity Scheme Extended to Tenant Farmers in TN",
+                date: "Nov 2024",
+                state: "tamilnadu",
+                category: "subsidy",
+                content: "Tamil Nadu's free electricity scheme for agriculture has been extended to include tenant farmers and sharecroppers. Previously available only to landowners, the scheme now covers all farmers operating agricultural pumpsets. This move is expected to benefit an additional 3 lakh tenant farmers across the state.",
+                url: "https://agri.tn.gov.in/"
+            },
+            {
+                id: 8,
+                title: "Karnataka Announces 50% Subsidy on Organic Certification",
+                date: "Dec 2024",
+                state: "karnataka",
+                category: "training",
+                content: "Karnataka Government has launched a new scheme providing 50% subsidy on organic certification costs. The scheme aims to encourage farmers to adopt organic farming practices. Certification costs, which typically range from ₹15,000 to ₹30,000, will now be subsidized up to ₹15,000 per farmer. Training on organic farming methods will also be provided free of cost.",
+                url: "https://raitamitra.karnataka.gov.in/"
+            },
+            {
+                id: 9,
+                title: "Raitha Siri: 15 Lakh Farmers Benefit from Zero-Interest Loans",
+                date: "Nov 2024",
+                state: "karnataka",
+                category: "loan",
+                content: "Karnataka's Raitha Siri scheme has successfully provided zero-interest crop loans to over 15 lakh farmers. The state government bears the entire interest burden, making loans up to ₹3 lakh completely interest-free. The scheme has disbursed over ₹18,000 crore in loans, significantly reducing the financial burden on farmers.",
+                url: "https://raitamitra.karnataka.gov.in/"
+            },
+            {
+                id: 10,
+                title: "AP: Rythu Bharosa Amount to Increase to ₹15,000 from 2025",
+                date: "Dec 2024",
+                state: "andhrapradesh",
+                category: "subsidy",
+                content: "Andhra Pradesh Government has announced an increase in Rythu Bharosa financial assistance from ₹13,500 to ₹15,000 per year from January 2025. This includes ₹6,000 from PM-KISAN and ₹9,000 from the state government. The scheme provides direct income support to all farmer families in the state, benefiting over 60 lakh farmers.",
+                url: "https://ysrrythubharosa.ap.gov.in/"
+            },
+            {
+                id: 11,
+                title: "National Agriculture Policy 2024 Draft Released for Comments",
+                date: "Dec 2024",
+                state: "all-india",
+                category: "training",
+                content: "The Ministry of Agriculture has released the draft National Agriculture Policy 2024 for public consultation. The policy focuses on doubling farmers' income, sustainable agriculture, climate-resilient farming, and promoting agri-tech startups. Stakeholders can submit their suggestions and feedback until January 31, 2025.",
+                url: "https://agricoop.nic.in/"
+            },
+            {
+                id: 12,
+                title: "Drone Spraying Subsidy: 75% Support for Farmer Groups",
+                date: "Nov 2024",
+                state: "all-india",
+                category: "equipment",
+                content: "The Government has announced 75% subsidy on agricultural drones for farmer producer organizations (FPOs) and custom hiring centers. Individual farmers can avail 50% subsidy. Drones can be used for pesticide spraying, fertilizer application, and crop monitoring. The scheme aims to promote precision agriculture and reduce chemical usage.",
+                url: "https://agricoop.nic.in/"
+            },
+        ];
+
+        window.onload = () => {
+            const langSelect = document.getElementById('lang-select');
+            const savedLang = localStorage.getItem('agri_lang');
+            if (savedLang) langSelect.value = savedLang;
+
+            langSelect.onchange = () => {
+                localStorage.setItem('agri_lang', langSelect.value);
+            };
+
+            // Initialize data
+            allSchemes = [...schemesData];
+            allNews = [...newsData];
+
+            // Try to fetch from API, fallback to local data
+            const user = JSON.parse(localStorage.getItem('agrisathi_user'));
+            if (user) {
+                if (user.state) document.getElementById('state-select').value = user.state.toLowerCase();
+                if (user.village) {
+                    // Check if village/district is in our select list
+                    const districtSelect = document.getElementById('district-select');
+                    const profileDist = user.village.toLowerCase();
+                    for (let i = 0; i < districtSelect.options.length; i++) {
+                        if (profileDist.includes(districtSelect.options[i].value)) {
+                            districtSelect.value = districtSelect.options[i].value;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            fetchData();
+        };
+
+        async function fetchData() {
+            const container = document.getElementById('schemes-list');
+            const newsContainer = document.getElementById('news-list');
+
+            // Show loading states
+            container.innerHTML = `<div class="p-8 text-center text-gray-400 animate-pulse font-bold">📡 Scanning for latest schemes...</div>`;
+            newsContainer.innerHTML = `<div class="p-4 text-center text-gray-400 animate-pulse font-bold">📡 Syncing news...</div>`;
+
+            const lang = document.getElementById('lang-select').value;
+            const state = document.getElementById('state-select').value;
+            const district = document.getElementById('district-select').value;
+            const crop = document.getElementById('crop-select').value;
+            const query = document.getElementById('search-input').value;
+
+            try {
+                // Fetch Schemes from API
+                const schemeUrl = `${API_BASE}/government/schemes?lang=${lang}&district=${district}&crop=${crop}&category=${currentCategory}&q=${encodeURIComponent(query)}`;
+                const schemeRes = await fetch(schemeUrl);
+                let apiSchemes = [];
+                if (schemeRes.ok) {
+                    apiSchemes = await schemeRes.json();
+                }
+
+                // If API empty or failed, use filtered local data as fallback
+                if (apiSchemes.length === 0) {
+                    apiSchemes = schemesData.filter(s => {
+                        const matchesState = !state || s.state === state || s.state === 'all-india';
+                        const matchesCategory = currentCategory === 'all' || s.category === currentCategory;
+                        const query = document.getElementById('search-input').value.toLowerCase();
+                        const matchesQuery = !query || s.name.toLowerCase().includes(query) || s.description.toLowerCase().includes(query);
+                        return matchesState && matchesCategory && matchesQuery;
+                    });
+                }
+                allSchemes = apiSchemes;
+                renderSchemes(allSchemes);
+
+                // Fetch News from API
+                const newsUrl = `${API_BASE}/government/news?location=${state || 'India'}&lang=${lang}`;
+                const newsRes = await fetch(newsUrl);
+                if (newsRes.ok) {
+                    allNews = await newsRes.json();
+                } else {
+                    allNews = newsData; // hard fallback
+                }
+                renderNews(allNews);
+
+                updateStats(allSchemes.length, allNews.length);
+            } catch (err) {
+                console.error("API Error:", err);
+                // Fallback to local
+                allSchemes = schemesData;
+                renderSchemes(allSchemes);
+                renderNews(newsData);
+                updateStats();
+            }
+        }
+
+        function performSearch() {
+            // We use the same fetchData to keep it synced with backend
+            fetchData();
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            fetchData();
+        }
+
+        function updateStats(schemeCount, newsCount) {
+            document.getElementById('total-schemes').textContent = schemeCount ?? allSchemes.length;
+            document.getElementById('total-news').textContent = newsCount ?? allNews.length;
+        }
+
+        function renderSchemes(schemes) {
+            const container = document.getElementById('schemes-list');
+            if (schemes.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-400"><i class="fas fa-search text-5xl mb-4"></i><p class="font-bold">No matching schemes found</p><p class="text-sm">Try broader filters</p></div>`;
+                return;
+            }
+
+            container.innerHTML = schemes.map(s => `
+                <div class="scheme-card p-6 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 hover:border-green-300 transition-all duration-300">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex space-x-2">
+                            <span class="text-[10px] font-black uppercase px-3 py-1 bg-green-50 text-green-700 rounded-full">${s.category}</span>
+                            <span class="text-[10px] font-black uppercase px-3 py-1 bg-blue-50 text-blue-700 rounded-full">${s.crops ? s.crops[0] : 'All Crops'}</span>
+                        </div>
+                        <span class="text-xs font-black text-green-600">${s.amount}</span>
+                    </div>
+                    <h3 class="font-black agri-text text-xl mb-1">${s.name}</h3>
+                    <p class="text-xs text-gray-400 font-bold mb-3 uppercase tracking-wider">${s.fullName}</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-4">${s.description}</p>
+                    
+                    ${s.ai_summary ? `
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl mb-4 border border-green-100">
+                        <p class="text-xs text-green-800 leading-relaxed italic font-medium">${s.ai_summary}</p>
+                    </div>` : ''}
+
+                    <div class="grid grid-cols-2 gap-4 mb-6 text-[11px] font-bold text-gray-500">
+                        <div class="flex items-center"><i class="fas fa-user-check mr-2 text-blue-400"></i> ${s.eligibility?.split(' ').slice(0, 3).join(' ') || 'Eligible Farmers'}...</div>
+                        <div class="flex items-center"><i class="fas fa-clock mr-2 text-orange-400"></i> ${s.deadline || 'Ongoing'}</div>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-gray-100 pt-4 mt-auto">
+                        <span class="text-[10px] font-black uppercase text-green-600 px-3 py-1 bg-green-50 rounded-full">${s.status}</span>
+                        <a href="${s.link}" target="_blank" class="flex items-center space-x-2 text-xs font-black text-white bg-blue-600 px-5 py-2.5 rounded-2xl hover:bg-blue-700 shadow-md">
+                            <span>Apply Now</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNews(news) {
+            const container = document.getElementById('news-list');
+
+            if (news.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fas fa-newspaper text-5xl mb-4"></i>
+                        <p class="font-bold">No news found</p>
+                        <p class="text-sm">Try different search terms or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = news.map(n => `
+                <div onclick="openNewsModal(${n.id})" class="news-card p-5 rounded-3xl shadow-sm border border-gray-100 hover:border-green-300 hover:shadow-lg transition-all duration-300 cursor-pointer card-hover">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-14 h-14 bg-gradient-to-br ${getNewsGradient(n.category)} rounded-2xl flex items-center justify-center text-white text-xl shrink-0 shadow-md">
+                            <i class="${getNewsIcon(n.category)}"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="text-sm font-black agri-text leading-snug mb-2">${n.title}</h4>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-[10px] font-bold text-gray-400"><i class="fas fa-calendar mr-1"></i>${n.date}</span>
+                                <span class="text-[10px] font-black uppercase px-2 py-1 rounded-full ${getCategoryColor(n.category)}">${n.category}</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openNewsModal(newsId) {
+            const news = allNews.find(n => n.id === newsId) || newsData.find(n => n.id === newsId);
+            if (!news) return;
+
+            document.getElementById('modal-news-title').textContent = news.title;
+
+            // Generate content with AI summary highlighted
+            let contentHtml = news.content;
+            if (news.ai_summary) {
+                contentHtml = `
+                    <div class="bg-blue-50 p-6 rounded-3xl mb-8 border border-blue-100 flex items-start space-x-4">
+                        <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black text-blue-700 uppercase tracking-widest mb-1">AI Actionable Insight</h4>
+                            <p class="text-sm text-blue-900 font-bold leading-relaxed">${news.ai_summary}</p>
+                        </div>
+                    </div>
+                    ${news.content}
+                `;
+            }
+            document.getElementById('modal-news-content').innerHTML = contentHtml;
+
+            document.getElementById('modal-news-category').textContent = news.category;
+            document.getElementById('modal-news-category').className = `text-xs font-black uppercase px-3 py-1 rounded-full ${getCategoryColor(news.category)}`;
+            document.getElementById('modal-news-date').textContent = news.date;
+            document.getElementById('modal-news-link').href = news.url;
+
+            const iconDiv = document.getElementById('modal-news-icon');
+            iconDiv.className = `w-16 h-16 bg-gradient-to-br ${getNewsGradient(news.category)} rounded-2xl flex items-center justify-center text-white text-2xl mb-4 shadow-lg`;
+            iconDiv.innerHTML = `<i class="${getNewsIcon(news.category)}"></i>`;
+
+            document.getElementById('news-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNewsModal() {
+            document.getElementById('news-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                subsidy: 'bg-green-50 text-green-600',
+                loan: 'bg-blue-50 text-blue-600',
+                insurance: 'bg-yellow-50 text-yellow-700',
+                training: 'bg-purple-50 text-purple-600',
+                equipment: 'bg-orange-50 text-orange-600'
+            };
+            return colors[category] || 'bg-gray-50 text-gray-600';
+        }
+
+        function getNewsGradient(category) {
+            const gradients = {
+                subsidy: 'from-green-500 to-emerald-600',
+                loan: 'from-blue-500 to-indigo-600',
+                insurance: 'from-yellow-500 to-orange-600',
+                training: 'from-purple-500 to-pink-600',
+                equipment: 'from-orange-500 to-red-600'
+            };
+            return gradients[category] || 'from-gray-500 to-gray-600';
+        }
+
+        function getNewsIcon(category) {
+            const icons = {
+                subsidy: 'fas fa-rupee-sign',
+                loan: 'fas fa-university',
+                insurance: 'fas fa-shield-alt',
+                training: 'fas fa-graduation-cap',
+                equipment: 'fas fa-tractor'
+            };
+            return icons[category] || 'fas fa-newspaper';
+        }
+    </script>
+</body>
+
+</html>

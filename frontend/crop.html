@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Advisor | AgriSathi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="assets/js/translations.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+            background-attachment: fixed;
+        }
+
+        .agri-green {
+            background-color: #3ea847;
+        }
+
+        .agri-dark {
+            background-color: #1f5425;
+        }
+
+        .agri-text {
+            color: #1f5425;
+        }
+
+        .input-card {
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .input-card:hover {
+            border-color: #3ea847;
+            box-shadow: 0 4px 12px rgba(62, 168, 71, 0.1);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border: 2px solid #3ea847;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .upload-zone {
+            border: 3px dashed #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: #3ea847;
+            background-color: #f0fdf4;
+        }
+
+        .upload-zone.dragover {
+            border-color: #3ea847;
+            background-color: #dcfce7;
+        }
+
+        .diagnosis-result {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .health-score {
+            background: linear-gradient(135deg, #3ea847 0%, #16a34a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden lg:flex flex-col w-72 h-screen agri-dark text-white fixed left-0 top-0 z-50">
+        <div class="p-6 border-b border-white/10 flex items-center space-x-3">
+            <span class="text-3xl">🌾</span>
+            <span class="text-2xl font-black tracking-tight" data-i18n="app_name">AgriSathi</span>
+        </div>
+        <nav class="flex-grow p-4 mt-4 space-y-2">
+            <a href="index.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-th-large w-6"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+            <a href="assistant.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-robot w-6"></i><span data-i18n="nav_assistant">AI Assistant</span></a>
+            <a href="crop.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl bg-white/10 border-l-4 border-green-400 font-bold">
+                <i class="fas fa-leaf w-6"></i><span data-i18n="nav_crop">Crop Advisor</span></a>
+            <a href="government.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-landmark w-6"></i><span data-i18n="nav_govt">Govt Updates</span></a>
+            <a href="saved.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-bookmark w-6"></i><span data-i18n="nav_saved">Saved Advice</span></a>
+            <a href="profile.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-user w-6"></i><span data-i18n="nav_profile">Profile</span></a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-grow lg:ml-72 flex flex-col min-h-screen pb-10">
+        <!-- Top Bar -->
+        <header
+            class="glass-card border-b border-white/50 flex items-center justify-between px-6 py-4 sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="lg:hidden text-gray-500 text-xl"><i class="fas fa-arrow-left"></i></a>
+                <h1 class="text-xl font-black agri-text" data-i18n="nav_crop">Crop Advisor</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <select id="lang-select" onchange="setLanguage(this.value)"
+                    class="bg-gray-100 px-3 py-2 rounded-xl text-xs font-bold agri-text outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="ml">മലയാളം</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="p-6 lg:p-10 max-w-5xl mx-auto space-y-10">
+
+            <!-- Yield Predictor Section -->
+            <section class="space-y-6">
+                <div class="flex items-center space-x-3 border-b-2 border-green-100 pb-4">
+                    <div
+                        class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-xl shadow-inner">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <div>
+                        <h2 data-i18n="title_soil" class="text-2xl font-black agri-text">Soil Recommendation</h2>
+                        <p data-i18n="subtitle_soil"
+                            class="text-xs text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">AI Soil
+                            Health Logic</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="input-card p-5 rounded-3xl shadow-sm bg-white">
+                        <label data-i18n="label_n"
+                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Nitrogen
+                            (N)</label>
+                        <input type="number" id="n" placeholder="Value 0-140"
+                            class="w-full text-2xl font-black text-green-700 outline-none bg-transparent">
+                        <p class="text-[10px] text-gray-400 mt-2">In kg/ha</p>
+                    </div>
+                    <div class="input-card p-5 rounded-3xl shadow-sm bg-white">
+                        <label data-i18n="label_p"
+                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Phosphorus
+                            (P)</label>
+                        <input type="number" id="p" placeholder="Value 0-140"
+                            class="w-full text-2xl font-black text-green-700 outline-none bg-transparent">
+                    </div>
+                    <div class="input-card p-5 rounded-3xl shadow-sm bg-white">
+                        <label data-i18n="label_k"
+                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Potassium
+                            (K)</label>
+                        <input type="number" id="k" placeholder="Value 0-140"
+                            class="w-full text-2xl font-black text-green-700 outline-none bg-transparent">
+                    </div>
+                    <div class="input-card p-5 rounded-3xl shadow-sm bg-white">
+                        <label data-i18n="label_temp"
+                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Temperature</label>
+                        <input type="number" id="temp" value="28"
+                            class="w-full text-2xl font-black text-green-700 outline-none bg-transparent">
+                        <p class="text-[10px] text-gray-400 mt-2">Celsius (°C)</p>
+                    </div>
+                    <div class="input-card p-5 rounded-3xl shadow-sm bg-white">
+                        <label data-i18n="label_ph"
+                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Soil
+                            pH</label>
+                        <input type="number" step="0.1" id="ph" value="6.5"
+                            class="w-full text-2xl font-black text-green-700 outline-none bg-transparent">
+                    </div>
+                    <div class="input-card p-5 rounded-3xl shadow-sm bg-white">
+                        <label data-i18n="label_rain"
+                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Rainfall
+                            (mm)</label>
+                        <input type="number" id="rain" value="200"
+                            class="w-full text-2xl font-black text-green-700 outline-none bg-transparent">
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-4">
+                    <button onclick="getRecommendation()" id="btn-recom"
+                        class="agri-green text-white px-12 py-5 rounded-[2rem] font-black shadow-xl hover:scale-105 transition-all text-lg flex items-center">
+                        <i class="fas fa-magic mr-3"></i> <span data-i18n="btn_recom">Get Smart Suggestion</span>
+                    </button>
+                </div>
+
+                <!-- Result Card -->
+                <div id="result-box"
+                    class="hidden bg-white rounded-[3rem] shadow-2xl border-2 border-green-500 overflow-hidden">
+                    <!-- Header -->
+                    <div class="agri-green p-10 text-center text-white relative">
+                        <div class="absolute -right-10 -top-10 opacity-20"><i
+                                class="fas fa-leaf text-[12rem] rotate-45"></i></div>
+                        <span
+                            class="bg-white/20 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">Recommended
+                            Crop</span>
+                        <h3 id="crop-name" class="text-5xl lg:text-7xl font-black mb-4">Paddy</h3>
+                        <p id="crop-desc" class="text-green-50 max-w-md mx-auto leading-relaxed text-sm font-medium">
+                            Loading advice...</p>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-100">
+                        <!-- Weather Warning -->
+                        <div class="p-8 bg-white">
+                            <h4
+                                class="text-[11px] font-black text-orange-500 uppercase tracking-widest mb-4 flex items-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i> Weather Warning
+                            </h4>
+                            <p id="weather-warn" class="text-sm font-bold agri-text leading-relaxed">No warnings
+                                detected.</p>
+                        </div>
+                        <!-- Soil Status -->
+                        <div class="p-8 bg-white">
+                            <h4
+                                class="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center">
+                                <i class="fas fa-microscope mr-2"></i> Soil Health
+                            </h4>
+                            <div class="flex items-center space-x-3">
+                                <span id="soil-status-tag"
+                                    class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase">Healthy</span>
+                                <p id="soil-tip" class="text-xs text-gray-400 font-medium">Keep soil flooded for yield.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fertilizer Section -->
+                    <div class="p-10 border-t border-gray-100">
+                        <h4
+                            class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
+                            <i class="fas fa-flask text-green-500 mr-2"></i> Targeted Fertilizer & Correction Advice
+                        </h4>
+                        <div id="fertilizer-list" class="space-y-3">
+                            <!-- JS will inject items here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaf Doctor Section -->
+            <section class="space-y-6 pt-10">
+                <div class="flex items-center space-x-3 border-b-2 border-green-100 pb-4">
+                    <div
+                        class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center text-xl shadow-inner">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div>
+                        <h2 data-i18n="title_doctor" class="text-2xl font-black agri-text">Leaf Disease Doctor</h2>
+                        <p data-i18n="subtitle_doctor"
+                            class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
+                            Scan Leaves for
+                            Instant Cure</p>
+                    </div>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-gray-50 p-8 rounded-[2.5rem] border-2 border-dashed border-gray-200">
+                    <div class="text-center md:text-left space-y-4">
+                        <h4 data-i18n="doctor_h4" class="text-xl font-black agri-text leading-tight">Identify pests &
+                            diseases
+                            in seconds
+                            using AI vision.</h4>
+                        <p data-i18n="doctor_p" class="text-sm text-gray-500 leading-relaxed font-medium">Just upload a
+                            clear
+                            photo of your
+                            plant leaf and our AI Krishi Sakhi will diagnose the issue and suggest treatments.</p>
+                        <button onclick="document.getElementById('leaf').click()" id="btn-upload"
+                            class="bg-white px-6 py-4 rounded-2xl shadow-md border border-gray-100 font-black agri-text hover:bg-green-50 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-upload"></i> <span data-i18n="btn_upload">Upload Leaf Image</span>
+                        </button>
+                        <input type="file" id="leaf" class="hidden" onchange="analyzeLeaf(this)">
+                    </div>
+                    <div class="flex justify-center">
+                        <div id="leaf-preview-container"
+                            class="w-full max-w-xs h-64 bg-white rounded-3xl shadow-lg border-4 border-white flex flex-col items-center justify-center text-gray-300 relative">
+                            <i id="preview-icon" class="fas fa-image text-4xl mb-2"></i>
+                            <span id="preview-text" class="text-xs font-bold uppercase tracking-widest">Awaiting
+                                Photo</span>
+                            <img id="leaf-preview"
+                                class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctor Result Card -->
+                <div id="doctor-result"
+                    class="hidden bg-white rounded-[3rem] shadow-2xl border-2 border-yellow-500 overflow-hidden mt-8">
+                    <div class="bg-yellow-500 p-8 text-center text-white relative">
+                        <div class="absolute -right-10 -top-10 opacity-20"><i
+                                class="fas fa-microscope text-[10rem] rotate-12"></i></div>
+                        <span id="doc-res-badge"
+                            class="bg-white/20 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">Diagnosis
+                            Complete</span>
+                        <h3 id="doc-disease" class="text-4xl lg:text-5xl font-black mb-2">Leaf Blast</h3>
+                        <p id="doc-crop" class="text-yellow-50 text-sm font-bold uppercase tracking-widest">Crop: Paddy
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-100">
+                        <div class="p-8 bg-white">
+                            <h4
+                                class="text-[11px] font-black text-red-500 uppercase tracking-widest mb-4 flex items-center">
+                                <i class="fas fa-pills mr-2"></i> Cure / Treatment
+                            </h4>
+                            <p id="doc-cure" class="text-sm font-bold agri-text leading-relaxed">Loading treatment...
+                            </p>
+                        </div>
+                        <div class="p-8 bg-white">
+                            <h4
+                                class="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center">
+                                <i class="fas fa-question-circle mr-2"></i> Likely Cause
+                            </h4>
+                            <p id="doc-cause" class="text-sm font-bold agri-text leading-relaxed">Environmental factors.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-yellow-50 border-t border-yellow-100">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-10 h-10 bg-yellow-500 text-white rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-[11px] font-black text-yellow-700 uppercase tracking-widest mb-1">Expert
+                                    Tip for Prevention</h4>
+                                <p id="doc-tip" class="text-sm font-bold agri-text">Rotate crops next season.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8001";
+
+        window.onload = () => {
+            const langSelect = document.getElementById('lang-select');
+            const savedLang = localStorage.getItem('agri_lang');
+            if (savedLang) {
+                langSelect.value = savedLang;
+                // applyTranslations is called by content loaded, but we might need to sync the select
+            }
+            // Translations.js handles the initial text load
+        }
+
+
+        async function getRecommendation() {
+            const btn = document.getElementById('btn-recom');
+            const resBox = document.getElementById('result-box');
+
+            const payload = {
+                N: parseFloat(document.getElementById('n').value) || 90,
+                P: parseFloat(document.getElementById('p').value) || 42,
+                K: parseFloat(document.getElementById('k').value) || 43,
+                temperature: parseFloat(document.getElementById('temp').value),
+                ph: parseFloat(document.getElementById('ph').value),
+                rainfall: parseFloat(document.getElementById('rain').value),
+                humidity: 80
+            };
+
+            resBox.classList.add('hidden');
+            btn.querySelector('span') ? btn.querySelector('span').innerHTML = 'Analyzing Soil...' : btn.innerHTML = 'Analyzing Soil...';
+            // Simple loading state
+
+            try {
+                const res = await fetch(`${API_BASE}/cultivation/recommend?lang=${document.getElementById('lang-select').value}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                document.getElementById('crop-name').innerText = data.recommended_crop;
+                document.getElementById('crop-desc').innerText = data.description;
+                document.getElementById('weather-warn').innerText = data.weather_warning;
+                document.getElementById('soil-tip').innerText = data.soil_tip;
+
+                const statusTag = document.getElementById('soil-status-tag');
+                statusTag.innerText = data.soil_status;
+                statusTag.className = data.soil_status === 'Healthy'
+                    ? 'px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase'
+                    : 'px-3 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-black uppercase';
+
+                const fertList = document.getElementById('fertilizer-list');
+                fertList.innerHTML = '';
+                data.fertilizer_advice.forEach(advice => {
+                    const div = document.createElement('div');
+                    div.className = "flex items-start space-x-3 p-4 bg-gray-50 rounded-2xl border border-gray-100";
+                    div.innerHTML = `
+                        <div class="w-2 h-2 mt-1.5 rounded-full bg-green-500 flex-shrink-0"></div>
+                        <p class="text-sm font-bold agri-text">${advice}</p>
+                    `;
+                    fertList.appendChild(div);
+                });
+
+                resBox.classList.remove('hidden');
+                resBox.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert("ML Server is starting. Please try in a moment.");
+            } finally {
+                // Reset button text by reapplying translation or hard refresh
+                const lang = getLanguage();
+                setLanguage(lang); // This will re-apply the correct text from dictionary
+            }
+        }
+
+        async function analyzeLeaf(input) {
+            if (!input.files[0]) return;
+            const btn = document.getElementById('btn-upload');
+            const resBox = document.getElementById('doctor-result');
+
+            // Preview
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.getElementById('leaf-preview');
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+                document.getElementById('preview-icon').classList.add('hidden');
+                document.getElementById('preview-text').classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
+
+            resBox.classList.add('hidden');
+            btn.querySelector('span') ? btn.querySelector('span').innerHTML = 'Analyzing...' : btn.innerHTML = 'Analyzing...';
+
+            try {
+                const res = await fetch(`${API_BASE}/doctor/analyze?lang=${document.getElementById('lang-select').value}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                document.getElementById('doc-disease').innerText = data.disease;
+                document.getElementById('doc-crop').innerText = `Crop: ${data.crop}`;
+                document.getElementById('doc-cure').innerText = data.cure;
+                document.getElementById('doc-cause').innerText = data.cause;
+                document.getElementById('doc-tip').innerText = data.tip;
+
+                resBox.classList.remove('hidden');
+                resBox.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert("AI Doctor is busy. Please try again later.");
+            } finally {
+                const lang = getLanguage();
+                setLanguage(lang); // This will re-apply the correct text
+            }
+        }
+    </script>
+</body>
+
+</html>

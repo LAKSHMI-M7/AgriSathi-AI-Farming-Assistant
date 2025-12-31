@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant | AgriSathi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="assets/js/translations.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+            background-attachment: fixed;
+        }
+
+        .agri-green {
+            background-color: #3ea847;
+        }
+
+        .agri-dark {
+            background-color: #1f5425;
+        }
+
+        .agri-text {
+            color: #1f5425;
+        }
+
+        .chat-container {
+            scroll-behavior: smooth;
+        }
+
+        .bubble-ai {
+            animation: slideInLeft 0.3s ease-out;
+        }
+
+        .bubble-user {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .voice-pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar (Desktop) -->
+    <aside id="sidebar" class="hidden lg:flex flex-col w-72 h-screen agri-dark text-white fixed left-0 top-0 z-50">
+        <div class="p-6 border-b border-white/10 flex items-center space-x-3">
+            <span class="text-3xl">🌾</span>
+            <span class="text-2xl font-black tracking-tight" data-i18n="app_name">AgriSathi</span>
+        </div>
+        <nav class="flex-grow p-4 mt-4 space-y-2">
+            <a href="index.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-th-large w-6"></i>
+                <span data-i18n="nav_dashboard">Dashboard</span>
+            </a>
+            <a href="assistant.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl bg-white/10 border-l-4 border-green-400 font-bold">
+                <i class="fas fa-robot w-6"></i>
+                <span data-i18n="nav_assistant">AI Assistant</span>
+            </a>
+            <a href="crop.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-leaf w-6"></i>
+                <span data-i18n="nav_crop">Crop Advisor</span>
+            </a>
+            <a href="government.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-landmark w-6"></i>
+                <span data-i18n="nav_govt">Govt Updates</span>
+            </a>
+            <a href="saved.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-bookmark w-6"></i>
+                <span data-i18n="nav_saved">Saved Advice</span>
+            </a>
+            <a href="profile.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-user w-6"></i>
+                <span data-i18n="nav_profile">Profile</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow lg:ml-72 flex flex-col h-screen overflow-hidden">
+
+        <!-- Top Bar -->
+        <header
+            class="glass-card border-b border-white/50 flex items-center justify-between px-6 py-4 sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="lg:hidden text-gray-500 text-xl"><i class="fas fa-arrow-left"></i></a>
+                <div
+                    class="w-10 h-10 agri-green rounded-full flex items-center justify-center text-white text-xl shadow-lg">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold agri-text" data-i18n="assistant_title">Krishi Sakhi</h1>
+                    <span
+                        class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest"
+                        data-i18n="assistant_subtitle">AI CROP DOCTOR</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <select id="lang" onchange="setLanguage(this.value)"
+                    class="bg-gray-100 px-3 py-2 rounded-xl text-sm font-bold agri-text outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="ml">മലയാളം</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <div id="chat-box" class="flex-grow p-6 overflow-y-auto space-y-6 bg-[#f0f2f5] chat-container">
+            <!-- AI Welcome -->
+            <div class="flex justify-start">
+                <div class="max-w-[85%] bg-white p-4 rounded-2xl shadow-sm bubble-ai border border-gray-200">
+                    <p id="welcome-msg" class="text-sm agri-text leading-relaxed" data-i18n="assistant_welcome">
+                        Namaskaram! I am your <b>AgriSathi</b> assistant. How can I help you today?</p>
+                    <p id="welcome-hint" class="text-xs text-gray-400 mt-2 font-medium" data-i18n="assistant_hint">Try
+                        asking: "How to cure Paddy leaf blight?"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thinking Indicator (Hidden) -->
+        <div id="thinking" class="hidden px-6 py-2 bg-[#f0f2f5]">
+            <div class="flex items-center space-x-2 text-xs font-bold text-gray-400">
+                <span class="thinking-dot w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                <span class="thinking-dot w-1.5 h-1.5 bg-green-500 rounded-full" style="animation-delay: 0.2s"></span>
+                <span class="thinking-dot w-1.5 h-1.5 bg-green-500 rounded-full" style="animation-delay: 0.4s"></span>
+                <span class="ml-2 uppercase tracking-widest">Sakhi is thinking...</span>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-white p-4 lg:p-6 border-t border-gray-100">
+            <div class="max-w-4xl mx-auto flex items-center space-x-3">
+                <button onclick="document.getElementById('image-upload').click()"
+                    class="w-12 h-12 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <input type="file" id="image-upload" class="hidden" accept="image/*" onchange="handleImageUpload(this)">
+
+                <div class="flex-grow relative">
+                    <input id="user-input" type="text" placeholder="Type your farming question here..."
+                        data-i18n="type_placeholder"
+                        class="w-full bg-gray-100 border-none px-6 py-4 rounded-3xl outline-none focus:ring-2 focus:ring-green-300 transition-all font-medium pr-14">
+                    <button onclick="sendMessage()"
+                        class="absolute right-2 top-2 w-10 h-10 agri-green text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <button id="mic-btn" onclick="toggleVoice()"
+                    class="w-12 h-12 bg-yellow-400 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8001";
+        const chatBox = document.getElementById('chat-box');
+
+        // Initial setup
+        window.addEventListener('load', () => {
+            const savedLang = getLanguage();
+            if (document.getElementById('lang')) {
+                document.getElementById('lang').value = savedLang;
+            }
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            // Add User Message
+            addBubble('user', msg);
+            input.value = '';
+
+            // Thinking UI
+            document.getElementById('thinking').classList.remove('hidden');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const user = JSON.parse(localStorage.getItem('agrisathi_user'));
+                const res = await fetch(`${API_BASE}/assistant/query`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: msg,
+                        language: getLanguage(), // Use central helper
+                        user_id: user ? user.id : 1
+                    })
+                });
+                const data = await res.json();
+
+                document.getElementById('thinking').classList.add('hidden');
+                addBubble('ai', data.response);
+                if (data.audio_url) {
+                    const audio = new Audio(API_BASE + data.audio_url);
+                    audio.play();
+                }
+            } catch (err) {
+                document.getElementById('thinking').classList.add('hidden');
+                addBubble('ai', "I'm sorry, I'm having trouble connecting to the server. Please check your internet.");
+            }
+        }
+
+        function addBubble(type, text) {
+            const div = document.createElement('div');
+            div.className = `flex ${type === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            const content = `
+                <div class="max-w-[85%] ${type === 'user' ? 'agri-green text-white bubble-user shadow-md' : 'bg-white p-4 rounded-2xl shadow-sm bubble-ai border border-gray-200'} p-4 rounded-2xl">
+                    <p class="text-sm leading-relaxed">${text.replace(/\n/g, '<br>')}</p>
+                    ${type === 'ai' ? '<button onclick="saveAdvice(this)" class="mt-2 text-[10px] font-black uppercase text-green-600 tracking-widest"><i class="fas fa-bookmark mr-1"></i> Save Advice</button>' : ''}
+                </div>
+            `;
+            div.innerHTML = content;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function saveAdvice(btn) {
+            const text = btn.previousElementSibling.innerText;
+            const user = JSON.parse(localStorage.getItem('agrisathi_user'));
+            if (!user) return;
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const formData = new FormData();
+            formData.append('file', blob, `Advice_${Date.now()}.txt`);
+            formData.append('category', 'AI Advice');
+            formData.append('user_id', user.id);
+
+            try {
+                await fetch(`${API_BASE}/documents/upload`, { method: 'POST', body: formData });
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> SAVED';
+                btn.classList.replace('text-green-600', 'text-gray-400');
+            } catch (err) { alert("Failed to save advice"); }
+        }
+
+        // Handle Enter
+        document.getElementById('user-input').onkeypress = (e) => {
+            if (e.key === 'Enter') sendMessage();
+        };
+
+        // Voice Integration
+        let recognition;
+        let isRecording = false;
+
+        function toggleVoice() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return alert("Your browser does not support voice input.");
+
+            const lang = getLanguage();
+            if (!recognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById('mic-btn').classList.add('voice-pulse', 'bg-red-500');
+                    document.getElementById('user-input').placeholder = "Listening...";
+                };
+
+                recognition.onresult = (event) => {
+                    const text = event.results[0][0].transcript;
+                    document.getElementById('user-input').value = text;
+                    sendMessage();
+                };
+
+                recognition.onerror = (event) => {
+                    console.error("Speech Error", event.error);
+                    stopRecording();
+                };
+
+                recognition.onend = () => {
+                    stopRecording();
+                };
+            }
+
+            // Update language every time we start to match current selection
+            recognition.lang = lang === 'ta' ? 'ta-IN' : lang === 'ml' ? 'ml-IN' : lang === 'hi' ? 'hi-IN' : 'en-US';
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            document.getElementById('mic-btn').classList.remove('voice-pulse', 'bg-red-500');
+            const lang = getLanguage();
+            // Fallback placeholder reset
+            const placeholder = translations[lang] ? translations[lang].type_placeholder : "Type your farming question here...";
+            document.getElementById('user-input').placeholder = placeholder;
+        }
+
+        async function handleImageUpload(input) {
+            if (!input.files[0]) return;
+
+            // Add User Image Bubble
+            const reader = new FileReader();
+            reader.onload = e => {
+                const imgHtml = `<img src="${e.target.result}" class="max-w-[200px] rounded-2xl shadow-md mb-2 border-2 border-white">`;
+                addBubble('user', imgHtml + "<br>I've uploaded a photo for diagnosis.");
+            };
+            reader.readAsDataURL(input.files[0]);
+
+            // Thinking State
+            document.getElementById('thinking').classList.remove('hidden');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+
+                const lang = getLanguage();
+                const res = await fetch(`${API_BASE}/doctor/analyze?lang=${lang}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                document.getElementById('thinking').classList.add('hidden');
+
+                const responseText = `<b>🌿 Diagnosis:</b> ${data.disease}<br><b>📦 Crop:</b> ${data.crop}<br><b>💊 Treatment:</b> ${data.cure}<br><b>💡 Expert Tip:</b> ${data.tip}`;
+                addBubble('ai', responseText);
+            } catch (err) {
+                document.getElementById('thinking').classList.add('hidden');
+                addBubble('ai', "I'm sorry, I couldn't analyze that image right now. Please try again.");
+            }
+            // Clear input
+            input.value = '';
+        }
+    </script>
+</body>
+
+</html>

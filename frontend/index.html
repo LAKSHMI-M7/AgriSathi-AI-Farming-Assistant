@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | AgriSathi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="assets/js/translations.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+            background-attachment: fixed;
+        }
+
+        .agri-green {
+            background-color: #3ea847;
+        }
+
+        .agri-dark {
+            background-color: #1f5425;
+        }
+
+        .agri-text {
+            color: #1f5425;
+        }
+
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .card-soft {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .gradient-green {
+            background: linear-gradient(135deg, #166534 0%, #15803d 50%, #16a34a 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .action-btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar (Desktop) -->
+    <aside id="sidebar" class="hidden lg:flex flex-col w-72 h-screen agri-dark text-white fixed left-0 top-0 z-50">
+        <div class="p-6 border-b border-white/10 flex items-center space-x-3">
+            <span class="text-3xl">🌾</span>
+            <span class="text-2xl font-black tracking-tight" data-i18n="app_name">AgriSathi</span>
+        </div>
+
+        <nav class="flex-grow p-4 mt-4 space-y-2">
+            <a href="index.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl bg-white/10 border-l-4 border-green-400 font-bold">
+                <i class="fas fa-th-large w-6"></i>
+                <span id="nav-dash" data-i18n="nav_dashboard">Dashboard</span>
+            </a>
+            <a href="assistant.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-robot w-6"></i>
+                <span id="nav-assistant" data-i18n="nav_assistant">AI Assistant</span>
+            </a>
+            <a href="crop.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-leaf w-6"></i>
+                <span id="nav-crop" data-i18n="nav_crop">Crop Advisor</span>
+            </a>
+            <a href="government.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-landmark w-6"></i>
+                <span id="nav-govt" data-i18n="nav_govt">Govt Updates</span>
+            </a>
+            <a href="saved.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-bookmark w-6"></i>
+                <span id="nav-saved" data-i18n="nav_saved">Saved Advice</span>
+            </a>
+            <a href="profile.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-user w-6"></i>
+                <span id="nav-profile" data-i18n="nav_profile">Profile</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/10">
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-4 p-4 rounded-2xl hover:bg-red-500/20 text-red-400 transition-colors font-bold">
+                <i class="fas fa-sign-out-alt w-6"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow lg:ml-72 flex flex-col min-h-screen">
+
+        <!-- Top Bar -->
+        <header
+            class="glass-card border-b border-white/50 flex items-center justify-between px-6 py-4 sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+            <div class="flex items-center space-x-4">
+                <button class="lg:hidden text-gray-500 text-2xl"><i class="fas fa-bars"></i></button>
+                <h1 class="text-xl font-bold agri-text hidden sm:block" data-i18n="nav_dashboard">Agriculture Dashboard
+                </h1>
+                <span id="welcome-name"
+                    class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100"
+                    data-i18n="welcome_farmer">Namaste, Farmer</span>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <select id="lang-select" onchange="setLanguage(this.value)"
+                    class="bg-gray-100 px-3 py-2 rounded-xl text-sm font-bold agri-text outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="ml">മലയാളം</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
+                <button onclick="useCurrentLocation()" title="Use Current Location"
+                    class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-100 transition-all">
+                    <i class="fas fa-location-arrow"></i>
+                </button>
+                <button onclick="initWeather()"
+                    class="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center hover:bg-green-100"><i
+                        class="fas fa-sync-alt"></i></button>
+                <div
+                    class="w-10 h-10 bg-yellow-400 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer">
+                    <i class="fas fa-microphone"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-6 lg:p-10 space-y-8">
+
+            <!-- Hero Welcome -->
+            <div
+                class="gradient-green rounded-[2.5rem] p-8 lg:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
+                <div class="relative z-10 text-center md:text-left">
+                    <h2 class="text-3xl lg:text-5xl font-black mb-4"><span id="welcome-text"
+                            data-i18n="welcome_farmer">Good Morning</span>,
+                        <br><span id="farmer-name">Kesavan</span>!
+                    </h2>
+                    <p id="hero-subtitle"
+                        class="text-green-50 text-lg max-w-md opacity-90 font-medium leading-relaxed mt-2"
+                        data-i18n="tagline">"Krishi
+                        Sakhi: Your Digital Farming Partner"</p>
+                    <div class="mt-8 flex flex-wrap gap-4 justify-center md:justify-start">
+                        <a href="assistant.html" id="hero-btn-ai"
+                            class="bg-white text-green-700 px-8 py-4 rounded-2xl font-black shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 group"
+                            data-i18n="nav_assistant">
+                            <i class="fas fa-robot text-green-600 group-hover:rotate-12 transition-transform"></i>
+                            <span>Ask AI Sathi</span>
+                        </a>
+                        <button id="hero-btn-crops"
+                            class="bg-green-400/30 backdrop-blur-md px-8 py-4 rounded-2xl font-bold border border-white/20"
+                            data-i18n="view_all">View My Crops</button>
+                    </div>
+                </div>
+                <!-- Decorative Element -->
+                <div class="hidden md:block absolute right-10 top-0 bottom-0 py-10 opacity-30 pointer-events-none">
+                    <i class="fas fa-leaf text-[20rem] -rotate-12 translate-x-32"></i>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Weather Module -->
+                <div id="weather-module" class="lg:col-span-1">
+                    <!-- Compact Weather Card -->
+                    <div id="weather-compact-card" onclick="openWeatherDetails()"
+                        class="glass-card rounded-[2rem] p-6 cursor-pointer hover:shadow-lg transition-all border-t-4 border-blue-500 group h-full flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 id="weather-loc-name" class="text-2xl font-black text-gray-800 tracking-tight">
+                                        --</h3>
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mt-1"><span
+                                            id="weather-date">--</span></p>
+                                </div>
+                                <div id="weather-curr-icon"
+                                    class="text-5xl text-blue-500 drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-cloud-sun"></i>
+                                </div>
+                            </div>
+
+                            <div class="flex items-baseline space-x-2">
+                                <span id="weather-curr-temp"
+                                    class="text-6xl font-black text-gray-800 tracking-tighter">--°</span>
+                                <span id="weather-curr-desc"
+                                    class="text-sm font-bold text-gray-500 capitalize">--</span>
+                            </div>
+
+                            <div class="pt-4 border-t border-gray-100 grid grid-cols-2 gap-4">
+                                <div class="bg-blue-50 p-3 rounded-xl">
+                                    <span
+                                        class="text-[10px] font-bold text-blue-400 uppercase block mb-1">Humidity</span>
+                                    <span id="weather-humid" class="font-black text-blue-700 text-lg">--%</span>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-xl">
+                                    <span class="text-[10px] font-bold text-green-400 uppercase block mb-1">AQI</span>
+                                    <span id="weather-aqi" class="font-black text-green-700 text-lg">--</span>
+                                </div>
+                            </div>
+                            <p
+                                class="text-[11px] font-bold text-blue-600 mt-2 flex items-center justify-end group-hover:translate-x-1 transition-transform">
+                                <span data-i18n="weather_forecast">Forecast</span> <i
+                                    class="fas fa-arrow-right ml-2"></i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Details Modal -->
+                <div id="weather-modal"
+                    class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden overflow-y-auto">
+                    <div class="min-h-screen flex items-center justify-center p-4">
+                        <div
+                            class="bg-white w-full max-w-7xl rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col lg:flex-row">
+                            <button onclick="closeWeatherDetails()"
+                                class="absolute right-8 top-8 w-12 h-12 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-lg z-10 transition-all hover:scale-110">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+
+                            <!-- Left Side: Advisory -->
+                            <div
+                                class="lg:w-1/3 p-8 lg:p-12 bg-gradient-to-b from-green-50/80 to-white border-r border-gray-100">
+                                <h2 id="modal-title" class="text-3xl font-black agri-text mb-8">🌦️ Today’s Farm
+                                    <br>Weather Advice
+                                </h2>
+
+                                <div class="space-y-8">
+                                    <div
+                                        class="flex items-center space-x-5 bg-white p-6 rounded-[2rem] shadow-sm border border-green-100">
+                                        <div
+                                            class="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center text-2xl text-orange-500 shadow-inner">
+                                            <i class="fas fa-thermometer-half"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                                Temperature</p>
+                                            <p id="modal-temp" class="text-2xl font-black agri-text">--°C</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-5">
+                                        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-blue-100">
+                                            <div
+                                                class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 mb-3">
+                                                <i class="fas fa-cloud-showers-heavy"></i>
+                                            </div>
+                                            <p
+                                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                                Rain</p>
+                                            <p id="modal-rain" class="text-xl font-black agri-text">--</p>
+                                        </div>
+                                        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-indigo-100">
+                                            <div
+                                                class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 mb-3">
+                                                <i class="fas fa-wind"></i>
+                                            </div>
+                                            <p
+                                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                                Wind</p>
+                                            <p id="modal-wind-adv" class="text-xl font-black agri-text">--</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-4 pt-8 border-t border-green-100">
+                                        <h4
+                                            class="font-black agri-text uppercase tracking-widest text-xs flex items-center">
+                                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> ✅ Farm Actions
+                                            Today
+                                        </h4>
+                                        <ul id="modal-actions-do" class="space-y-4"></ul>
+                                        <ul id="modal-actions-avoid" class="space-y-4"></ul>
+                                    </div>
+
+                                    <div class="pt-8 border-t border-green-100">
+                                        <h4
+                                            class="font-black agri-text uppercase tracking-widest text-xs mb-5 flex items-center">
+                                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> ⏰ Best Time
+                                            Today
+                                        </h4>
+                                        <div
+                                            class="bg-white p-6 rounded-[2rem] space-y-4 shadow-sm border border-gray-50">
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span
+                                                    class="font-bold text-gray-400 uppercase text-[10px]">Fertilizer</span>
+                                                <span id="best-fertilizer"
+                                                    class="font-black text-green-600 bg-green-50 px-3 py-1 rounded-full">--</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="font-bold text-gray-400 uppercase text-[10px]">Spray</span>
+                                                <span id="best-spray"
+                                                    class="font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full">--</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span
+                                                    class="font-bold text-gray-400 uppercase text-[10px]">Irrigation</span>
+                                                <span id="best-irrigation"
+                                                    class="font-black text-orange-600 bg-orange-50 px-3 py-1 rounded-full">--</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Side: Charts -->
+                            <div class="lg:w-2/3 p-10 lg:p-14 overflow-y-auto max-h-[90vh] bg-slate-50/30">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+                                    <h3 class="text-2xl font-black agri-text">Farmer-Friendly Weather Trends</h3>
+                                    <div class="flex space-x-2">
+                                        <span
+                                            class="px-4 py-2 bg-white rounded-2xl text-[10px] font-black text-gray-400 uppercase border border-gray-100 shadow-sm">Next
+                                            7 Days</span>
+                                        <span id="modal-region-tag"
+                                            class="px-4 py-2 bg-green-600 rounded-2xl text-[10px] font-black text-white uppercase shadow-lg">Local
+                                            Analysis</span>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div
+                                        class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <h4
+                                            class="text-xs font-black text-gray-400 uppercase mb-6 tracking-widest flex items-center">
+                                            <i class="fas fa-temperature-high text-orange-400 mr-2"></i> 🌡️ Temperature
+                                            Trend (°C)
+                                        </h4>
+                                        <div id="chart-temp" class="h-64"></div>
+                                    </div>
+                                    <div
+                                        class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <h4
+                                            class="text-xs font-black text-gray-400 uppercase mb-6 tracking-widest flex items-center">
+                                            <i class="fas fa-tint text-blue-400 mr-2"></i> 🌧️ Rainfall Forecast (mm)
+                                        </h4>
+                                        <div id="chart-rain" class="h-64"></div>
+                                    </div>
+                                    <div
+                                        class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <h4
+                                            class="text-xs font-black text-gray-400 uppercase mb-6 tracking-widest flex items-center">
+                                            <i class="fas fa-water text-green-400 mr-2"></i> 💧 Humidity Tracking (%)
+                                        </h4>
+                                        <div id="chart-humid" class="h-64"></div>
+                                    </div>
+                                    <div
+                                        class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <h4
+                                            class="text-xs font-black text-gray-400 uppercase mb-6 tracking-widest flex items-center">
+                                            <i class="fas fa-wind text-indigo-400 mr-2"></i> 🌬️ Wind Speed Index (km/h)
+                                        </h4>
+                                        <div id="chart-wind" class="h-64"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Decision Chart Section -->
+                                <div class="mt-12 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                                    <h4
+                                        class="font-black agri-text uppercase tracking-widest text-[11px] mb-8 flex items-center">
+                                        <i class="fas fa-chart-pie text-green-500 mr-2"></i> <span
+                                            id="modal-table-title">📊 Weather → Action Intelligence</span>
+                                    </h4>
+                                    <div class="overflow-hidden rounded-3xl border border-gray-50">
+                                        <table class="w-full text-left">
+                                            <thead class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black">
+                                                <tr>
+                                                    <th id="th-param" class="px-8 py-5">Parameter</th>
+                                                    <th id="th-status" class="px-8 py-5">Status</th>
+                                                    <th id="th-action" class="px-8 py-5">Recommended Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="decision-table-body" class="divide-y divide-gray-50"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Search Section -->
+                                <div
+                                    class="mt-10 bg-white p-8 rounded-[2.5rem] shadow-sm border border-orange-100 bg-gradient-to-r from-orange-50/20 to-transparent">
+                                    <h4
+                                        class="font-black agri-text uppercase tracking-widest text-[11px] mb-6 flex items-center">
+                                        <i class="fas fa-search-location text-orange-500 mr-2"></i> <span
+                                            id="search-title">🔍 Search Region (District/State)</span>
+                                    </h4>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="relative flex-grow">
+                                            <input type="text" id="weather-search-input"
+                                                placeholder="e.g. Wayanad, Kerala..."
+                                                class="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 font-bold agri-text placeholder:text-gray-300 shadow-sm">
+                                        </div>
+                                        <button onclick="searchWeatherByLocation()" id="search-btn"
+                                            class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-2xl font-black shadow-lg transition-all flex items-center space-x-2 active:scale-95">
+                                            <span>Search</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </button>
+                                    </div>
+                                    <p id="search-hint"
+                                        class="text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-widest">Type
+                                        your district or state to see local advisory & charts</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Govt Card -->
+                <div class="card-soft rounded-3xl p-6 shadow-sm border-t-4 border-yellow-400">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-black agri-text uppercase tracking-tighter">Govt Updates</h3>
+                        <span class="bg-yellow-100 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full font-bold">3
+                            NEW</span>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="text-xs font-bold text-gray-600 line-clamp-1 border-b border-gray-50 pb-2">Subhiksha
+                            Keralam Subsidy...</li>
+                        <li class="text-xs font-bold text-gray-600 line-clamp-1 border-b border-gray-50 pb-2">Paddy
+                            Procurement Update...</li>
+                        <li class="text-xs font-bold text-gray-600 line-clamp-1 pb-2">Fertilizer Subsidy Token...</li>
+                    </ul>
+                    <a href="government.html"
+                        class="mt-4 block text-center text-xs font-black text-green-600 hover:underline">View All
+                        Programs</a>
+                </div>
+
+                <!-- Crop Health -->
+                <div class="glass-card rounded-[2rem] p-6 border border-white/50 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-10 -mt-10 blur-xl">
+                    </div>
+                    <div class="flex items-center justify-between mb-4 relative z-10">
+                        <h3 class="font-black text-gray-800 text-lg flex items-center">
+                            <span
+                                class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 text-red-500"><i
+                                    class="fas fa-exclamation-triangle"></i></span>
+                            Crop Alert
+                        </h3>
+                        <span
+                            class="animate-pulse bg-red-100 text-red-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide">Action
+                            Needed</span>
+                    </div>
+                    <p id="crop-alert-text" class="text-sm text-gray-600 leading-relaxed mb-6 font-medium">Increased
+                        humidity may cause leaf
+                        fungus in your <span id="user-crop-alert">paddy</span> field. Apply urea safely.</p>
+                    <a href="crop.html"
+                        class="w-full flex items-center justify-center text-sm font-bold text-white bg-red-500 hover:bg-red-600 py-3 rounded-xl transition-colors shadow-lg shadow-red-500/30">
+                        <i class="fas fa-camera mr-2"></i> Scan Leaf Now
+                    </a>
+                </div>
+
+                <!-- Market Price -->
+                <div class="glass-card rounded-[2rem] p-6 cursor-pointer hover:border-purple-300 transition-all border-t-4 border-purple-500 group"
+                    onclick="openMarketModal()">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-black text-gray-800 uppercase text-sm tracking-wide" data-i18n="market_prices">
+                            Market Prices</h3>
+                        <span
+                            class="flex items-center text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>LIVE
+                        </span>
+                    </div>
+                    <div id="market-prices-compact" class="space-y-3">
+                        <!-- Will be populated by JS -->
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-4 text-center font-bold border-t border-gray-100 pt-3">
+                        <i class="fas fa-clock mr-1"></i>Updated: <span id="market-update-time">--</span>
+                    </p>
+                    <button
+                        class="w-full mt-2 text-xs font-black text-purple-600 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                        <span data-i18n="view_all">View All Prices</span> <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Market Prices Modal -->
+                <div id="market-modal"
+                    class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden overflow-y-auto">
+                    <div class="min-h-screen flex items-center justify-center p-4">
+                        <div class="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl relative overflow-hidden">
+                            <button onclick="closeMarketModal()"
+                                class="absolute right-8 top-8 w-12 h-12 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-lg z-10 transition-all hover:scale-110">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+
+                            <div class="p-10 lg:p-14">
+                                <div class="text-center mb-8">
+                                    <div class="text-5xl mb-4">📊</div>
+                                    <h2 class="text-3xl font-black agri-text mb-2">Live Market Prices</h2>
+                                    <p class="text-sm text-gray-500">Latest agricultural commodity prices from major
+                                        mandis</p>
+                                    <p class="text-xs text-green-600 font-bold mt-2">
+                                        <i class="fas fa-sync-alt mr-1"></i>Last updated: <span
+                                            id="modal-market-time">--</span>
+                                    </p>
+                                </div>
+
+                                <!-- Category Tabs -->
+                                <div class="flex flex-wrap gap-2 mb-6 justify-center">
+                                    <button onclick="filterMarket('all')"
+                                        class="market-tab active px-4 py-2 rounded-full text-xs font-bold bg-green-600 text-white">All</button>
+                                    <button onclick="filterMarket('grains')"
+                                        class="market-tab px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-600 hover:bg-green-100">Grains</button>
+                                    <button onclick="filterMarket('spices')"
+                                        class="market-tab px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-600 hover:bg-green-100">Spices</button>
+                                    <button onclick="filterMarket('fruits')"
+                                        class="market-tab px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-600 hover:bg-green-100">Fruits</button>
+                                    <button onclick="filterMarket('vegetables')"
+                                        class="market-tab px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-600 hover:bg-green-100">Vegetables</button>
+                                </div>
+
+                                <div id="market-prices-full"
+                                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[50vh] overflow-y-auto">
+                                    <!-- Will be populated by JS -->
+                                </div>
+
+                                <div class="mt-8 p-4 bg-yellow-50 rounded-2xl border border-yellow-200">
+                                    <p class="text-xs text-yellow-700 font-bold text-center">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Prices are indicative and may vary based on quality, location, and market
+                                        conditions.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Irrigation Schedule Modal -->
+            <div id="irrigation-modal"
+                class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden overflow-y-auto">
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl relative overflow-hidden">
+                        <button onclick="closeIrrigationModal()"
+                            class="absolute right-8 top-8 w-12 h-12 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-lg z-10 transition-all hover:scale-110">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+
+                        <div class="p-10 lg:p-14">
+                            <div class="text-center mb-8">
+                                <div class="text-5xl mb-4">💧</div>
+                                <h2 class="text-3xl font-black agri-text mb-2">Irrigation Schedule</h2>
+                                <p class="text-sm text-gray-500">Your personalized weekly watering plan</p>
+                            </div>
+
+                            <!-- Crop Selection -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-bold agri-text mb-3">Select Your Crops:</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="toggleCrop(this)"
+                                        class="crop-btn active px-4 py-2 rounded-full text-sm font-bold bg-blue-600 text-white"
+                                        data-crop="paddy">🌾
+                                        Paddy</button>
+                                    <button onclick="toggleCrop(this)"
+                                        class="crop-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600"
+                                        data-crop="coconut">🥥
+                                        Coconut</button>
+                                    <button onclick="toggleCrop(this)"
+                                        class="crop-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600"
+                                        data-crop="vegetables">🥬
+                                        Vegetables</button>
+                                    <button onclick="toggleCrop(this)"
+                                        class="crop-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600"
+                                        data-crop="banana">🍌
+                                        Banana</button>
+                                    <button onclick="toggleCrop(this)"
+                                        class="crop-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600"
+                                        data-crop="spices">🌶️
+                                        Spices</button>
+                                </div>
+                            </div>
+
+                            <!-- Weekly Schedule (Dynamic) -->
+                            <div id="irrigation-schedule-grid" class="grid grid-cols-7 gap-2 mb-8">
+                                <!-- Will be populated by JS -->
+                            </div>
+
+                            <!-- Selected Crops Info -->
+                            <div id="water-requirements" class="mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-200">
+                                <p class="text-sm font-bold agri-text mb-2"><i
+                                        class="fas fa-info-circle text-blue-500 mr-2"></i>Water Requirements for
+                                    Selected Crops:</p>
+                                <p id="water-req-text" class="text-xs text-gray-600">🌾 Paddy: Keep flooded 2-5 cm
+                                    constantly</p>
+                            </div>
+
+                            <!-- Recommendations -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div
+                                    class="bg-gradient-to-r from-blue-50 to-white p-6 rounded-2xl border border-blue-100">
+                                    <h4 class="font-black agri-text mb-3 flex items-center">
+                                        <i class="fas fa-clock text-blue-500 mr-2"></i> Best Irrigation Times
+                                    </h4>
+                                    <ul class="space-y-2 text-sm text-gray-600">
+                                        <li class="flex items-center"><span
+                                                class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>Morning: 5:30 AM -
+                                            7:00 AM</li>
+                                        <li class="flex items-center"><span
+                                                class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>Evening: 5:00 PM
+                                            - 6:30 PM</li>
+                                        <li class="flex items-center"><span
+                                                class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>Avoid: 10 AM - 4 PM
+                                            (high evaporation)</li>
+                                    </ul>
+                                </div>
+                                <div
+                                    class="bg-gradient-to-r from-green-50 to-white p-6 rounded-2xl border border-green-100">
+                                    <h4 class="font-black agri-text mb-3 flex items-center">
+                                        <i class="fas fa-leaf text-green-500 mr-2"></i> Water Requirements
+                                    </h4>
+                                    <ul class="space-y-2 text-sm text-gray-600">
+                                        <li class="flex items-center"><span class="mr-2">🌾</span>Paddy: Keep flooded
+                                            2-5 cm</li>
+                                        <li class="flex items-center"><span class="mr-2">🥥</span>Coconut: 40-50
+                                            L/tree/week</li>
+                                        <li class="flex items-center"><span class="mr-2">🥬</span>Vegetables: Daily
+                                            light watering</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Weather Alert -->
+                            <div class="mt-6 p-4 bg-yellow-50 rounded-2xl border border-yellow-200 flex items-center">
+                                <i class="fas fa-cloud-rain text-3xl text-yellow-600 mr-4"></i>
+                                <div>
+                                    <p class="font-bold text-yellow-800">Rain Expected Tomorrow</p>
+                                    <p class="text-xs text-yellow-600">Skip irrigation on Tuesday - natural rainfall
+                                        expected (15mm)</p>
+                                </div>
+                            </div>
+
+                            <!-- Reminder Settings Panel (Hidden by default) -->
+                            <div id="reminder-settings"
+                                class="hidden mt-6 p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl border border-purple-200">
+                                <h4 class="font-black agri-text mb-4 flex items-center">
+                                    <i class="fas fa-bell text-purple-500 mr-2"></i> Set Irrigation Reminders
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 mb-2">Morning
+                                            Reminder</label>
+                                        <input type="time" id="reminder-morning" value="06:00"
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 mb-2">Evening
+                                            Reminder</label>
+                                        <input type="time" id="reminder-evening" value="17:30"
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm">
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-mon" checked class="mr-2 accent-purple-600">
+                                        Mon
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-tue" class="mr-2 accent-purple-600"> Tue
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-wed" checked class="mr-2 accent-purple-600">
+                                        Wed
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-thu" class="mr-2 accent-purple-600"> Thu
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-fri" checked class="mr-2 accent-purple-600">
+                                        Fri
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-sat" checked class="mr-2 accent-purple-600">
+                                        Sat
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="remind-sun" class="mr-2 accent-purple-600"> Sun
+                                    </label>
+                                </div>
+                                <button onclick="saveReminders()"
+                                    class="w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-all">
+                                    <i class="fas fa-save mr-2"></i>Save Reminders
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-8 flex flex-wrap gap-4 justify-center">
+                                <button onclick="closeIrrigationModal()"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all">
+                                    <i class="fas fa-check mr-2"></i>Got It!
+                                </button>
+                                <button onclick="toggleReminderSettings()" id="reminder-btn"
+                                    class="bg-gray-100 hover:bg-purple-100 text-gray-700 px-8 py-3 rounded-2xl font-bold transition-all">
+                                    <i class="fas fa-bell mr-2"></i>Set Reminders
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News & Advisor Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Large Feature Card -->
+                <div class="lg:col-span-2 relative h-64 lg:h-auto rounded-[2.5rem] overflow-hidden group shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1596120497515-3bb210100632?auto=format&fit=crop&q=80&w=1200"
+                        alt="Farmer"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent"></div>
+                    <div class="absolute inset-0 p-10 flex flex-col justify-end text-white">
+                        <span
+                            class="bg-green-500 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded mb-4 w-fit">Seasonal
+                            Tip</span>
+                        <h3 class="text-2xl lg:text-4xl font-black max-w-md mb-4 leading-tight">Best practices for
+                            organic coconut farming in Wayanad.</h3>
+                        <a href="roadmap.html"
+                            class="flex items-center space-x-2 text-sm font-bold hover:text-green-400 transition-colors">
+                            <span>Read Full Advisory</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions List -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-black text-gray-400 uppercase tracking-widest px-2 mb-2">Quick Actions</h4>
+
+                    <a href="government.html"
+                        class="w-full glass-card p-4 rounded-2xl flex items-center hover:scale-[1.02] transition-transform cursor-pointer group">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-200 mr-4 group-hover:rotate-6 transition-transform">
+                            <i class="fas fa-file-invoice-dollar text-xl"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-black text-sm text-gray-800 group-hover:text-green-600 transition-colors"
+                                data-i18n="govt_schemes">Govt Schemes</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="apply_now">Apply Now</p>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-green-50 transition-colors">
+                            <i class="fas fa-chevron-right text-xs text-gray-400 group-hover:text-green-500"></i>
+                        </div>
+                    </a>
+
+                    <button onclick="openIrrigationModal()"
+                        class="w-full glass-card p-4 rounded-2xl flex items-center hover:scale-[1.02] transition-transform cursor-pointer group">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200 mr-4 group-hover:rotate-6 transition-transform">
+                            <i class="fas fa-tint text-xl"></i>
+                        </div>
+                        <div class="flex-grow text-left">
+                            <p class="font-black text-sm text-gray-800 group-hover:text-blue-600 transition-colors"
+                                data-i18n="irrigation_schedule">Irrigation Schedule</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="my_plan">View Plan</p>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors">
+                            <i class="fas fa-chevron-right text-xs text-gray-400 group-hover:text-blue-500"></i>
+                        </div>
+                    </button>
+
+                    <a href="crop.html"
+                        class="w-full glass-card p-4 rounded-2xl flex items-center hover:scale-[1.02] transition-transform cursor-pointer group">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-200 mr-4 group-hover:rotate-6 transition-transform">
+                            <i class="fas fa-camera text-xl"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-black text-sm text-gray-800 group-hover:text-orange-600 transition-colors"
+                                data-i18n="disease_detection">Crop Diagnosis</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="click_photo">Scan Now
+                            </p>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-orange-50 transition-colors">
+                            <i class="fas fa-chevron-right text-xs text-gray-400 group-hover:text-orange-500"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8001";
+        let weatherData = null;
+        let allMarketPrices = [];
+
+        // Market Prices Data
+        const marketPricesData = [
+            // Grains
+            { name: "Paddy (Rice)", price: 2450, unit: "qntl", change: 3.2, category: "grains", icon: "🌾" },
+            { name: "Wheat", price: 2680, unit: "qntl", change: 1.8, category: "grains", icon: "🌾" },
+            { name: "Maize", price: 2150, unit: "qntl", change: -0.5, category: "grains", icon: "🌽" },
+            { name: "Jowar (Sorghum)", price: 3200, unit: "qntl", change: 2.1, category: "grains", icon: "🌾" },
+            { name: "Ragi (Finger Millet)", price: 3850, unit: "qntl", change: 4.5, category: "grains", icon: "🌾" },
+
+            // Spices
+            { name: "Black Pepper", price: 645, unit: "kg", change: 5.2, category: "spices", icon: "🌶️" },
+            { name: "Cardamom", price: 1850, unit: "kg", change: -2.3, category: "spices", icon: "🫛" },
+            { name: "Turmeric", price: 185, unit: "kg", change: 8.4, category: "spices", icon: "🟡" },
+            { name: "Ginger", price: 125, unit: "kg", change: 3.7, category: "spices", icon: "🫚" },
+            { name: "Cloves", price: 980, unit: "kg", change: 1.2, category: "spices", icon: "🌿" },
+            { name: "Cinnamon", price: 420, unit: "kg", change: -1.5, category: "spices", icon: "🪵" },
+
+            // Fruits
+            { name: "Coconut", price: 35, unit: "pc", change: -4.2, category: "fruits", icon: "🥥" },
+            { name: "Banana", price: 48, unit: "kg", change: 2.8, category: "fruits", icon: "🍌" },
+            { name: "Mango (Alphonso)", price: 180, unit: "kg", change: 12.5, category: "fruits", icon: "🥭" },
+            { name: "Papaya", price: 32, unit: "kg", change: -1.8, category: "fruits", icon: "🍈" },
+            { name: "Pineapple", price: 45, unit: "pc", change: 3.2, category: "fruits", icon: "🍍" },
+            { name: "Jackfruit", price: 25, unit: "kg", change: 0.8, category: "fruits", icon: "🍈" },
+
+            // Vegetables
+            { name: "Tomato", price: 42, unit: "kg", change: -15.3, category: "vegetables", icon: "🍅" },
+            { name: "Onion", price: 38, unit: "kg", change: 8.6, category: "vegetables", icon: "🧅" },
+            { name: "Potato", price: 28, unit: "kg", change: 2.1, category: "vegetables", icon: "🥔" },
+            { name: "Brinjal", price: 35, unit: "kg", change: -3.4, category: "vegetables", icon: "🍆" },
+            { name: "Okra (Lady Finger)", price: 55, unit: "kg", change: 5.2, category: "vegetables", icon: "🥒" },
+            { name: "Green Chilli", price: 85, unit: "kg", change: 12.8, category: "vegetables", icon: "🌶️" },
+            { name: "Cabbage", price: 22, unit: "kg", change: -2.5, category: "vegetables", icon: "🥬" },
+            { name: "Cauliflower", price: 45, unit: "kg", change: 4.3, category: "vegetables", icon: "🥦" }
+        ];
+
+        window.onload = () => {
+            const user = JSON.parse(localStorage.getItem('agrisathi_user'));
+            if (!user) { window.location.href = 'login.html'; }
+            else {
+                document.getElementById('welcome-name').innerText = `Namaste, ${user.full_name}`;
+                document.getElementById('farmer-name').innerText = user.full_name;
+                document.getElementById('user-crop-alert').innerText = (user.primary_crop || "paddy").toLowerCase();
+                document.getElementById('weather-date').innerText = new Date().toLocaleDateString('en-US', {
+                    weekday: 'long', month:
+                        'long', day: 'numeric', year: 'numeric'
+                });
+                initWeather();
+                initMarketPrices();
+            }
+        };
+
+        function initMarketPrices() {
+            allMarketPrices = marketPricesData;
+
+            // Update timestamp
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('market-update-time').innerText = timeStr;
+
+            // Render compact view (top 3 items)
+            renderCompactMarket();
+        }
+
+        function renderCompactMarket() {
+            const container = document.getElementById('market-prices-compact');
+            const topItems = allMarketPrices.slice(0, 4);
+
+            container.innerHTML = topItems.map(item => `
+    <div class="flex justify-between items-center text-xs">
+        <span class="font-bold text-gray-500">${item.icon} ${item.name}</span>
+        <span class="font-black ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}">
+            ₹${item.price.toLocaleString()}/${item.unit}
+            <i class="fas fa-caret-${item.change >= 0 ? 'up' : 'down'}"></i>
+        </span>
+    </div>
+    `).join('');
+        }
+
+        function openMarketModal() {
+            document.getElementById('market-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            const now = new Date();
+            const timeStr = now.toLocaleString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+            document.getElementById('modal-market-time').innerText = timeStr;
+
+            renderFullMarket('all');
+        }
+
+        function closeMarketModal() {
+            document.getElementById('market-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function filterMarket(category) {
+            // Update tab styles
+            document.querySelectorAll('.market-tab').forEach(tab => {
+                tab.classList.remove('bg-green-600', 'text-white');
+                tab.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            event.target.classList.remove('bg-gray-100', 'text-gray-600');
+            event.target.classList.add('bg-green-600', 'text-white');
+
+            renderFullMarket(category);
+        }
+
+        function renderFullMarket(category) {
+            const container = document.getElementById('market-prices-full');
+            let items = category === 'all' ? allMarketPrices : allMarketPrices.filter(i => i.category === category);
+
+            container.innerHTML = items.map(item => `
+    <div
+        class="bg-gradient-to-r from-gray-50 to-white p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">${item.icon}</span>
+                <div>
+                    <p class="font-bold text-sm agri-text">${item.name}</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">${item.category}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="font-black text-lg ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}">
+                    ₹${item.price.toLocaleString()}
+                </p>
+                <p class="text-[10px] font-bold ${item.change >= 0 ? 'text-green-500' : 'text-red-500'}">
+                    <i class="fas fa-caret-${item.change >= 0 ? 'up' : 'down'} mr-1"></i>
+                    ${Math.abs(item.change)}%
+                </p>
+            </div>
+        </div>
+        <div class="mt-2 pt-2 border-t border-gray-50 flex justify-between text-[10px] text-gray-400">
+            <span>Per ${item.unit}</span>
+            <span class="font-bold ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}">
+                ${item.change >= 0 ? '↑ Rising' : '↓ Falling'}
+            </span>
+        </div>
+    </div>
+    `).join('');
+        }
+
+        // Irrigation Modal Functions
+        const cropSchedules = {
+            paddy: {
+                name: "🌾 Paddy",
+                waterReq: "Keep flooded 2-5 cm constantly. Drain 10 days before harvest.",
+                schedule: [
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Evening", hour: "5:30 PM" },
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Evening", hour: "5:30 PM" },
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Fertilizer", hour: "+ Water", special: true },
+                    { water: true, time: "Light", hour: "6:00 AM" }
+                ]
+            },
+            coconut: {
+                name: "🥥 Coconut",
+                waterReq: "40-50 liters per tree per week. Deep watering twice weekly.",
+                schedule: [
+                    { water: true, time: "Deep Water", hour: "6:00 AM" },
+                    { water: false },
+                    { water: false },
+                    { water: true, time: "Deep Water", hour: "6:00 AM" },
+                    { water: false },
+                    { water: true, time: "Fertilizer", hour: "Monthly", special: true },
+                    { water: false }
+                ]
+            },
+            vegetables: {
+                name: "🥬 Vegetables",
+                waterReq: "Daily light watering. Increase during flowering. Avoid wetting leaves.",
+                schedule: [
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Evening", hour: "5:30 PM" },
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Evening", hour: "5:30 PM" },
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: true, time: "Light", hour: "6:00 AM" }
+                ]
+            },
+            banana: {
+                name: "🍌 Banana",
+                waterReq: "15-20 liters per plant every 3-4 days. More during fruiting.",
+                schedule: [
+                    { water: true, time: "Deep Water", hour: "6:00 AM" },
+                    { water: false },
+                    { water: false },
+                    { water: true, time: "Deep Water", hour: "6:00 AM" },
+                    { water: false },
+                    { water: true, time: "Fertilizer", hour: "+ Water", special: true },
+                    { water: false }
+                ]
+            },
+            spices: {
+                name: "🌶️ Spices",
+                waterReq: "Moderate watering. Keep soil moist, not waterlogged. Reduce in winter.",
+                schedule: [
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: false },
+                    { water: true, time: "Evening", hour: "5:30 PM" },
+                    { water: false },
+                    { water: true, time: "Morning", hour: "6:00 AM" },
+                    { water: false },
+                    { water: true, time: "Light", hour: "6:00 AM" }
+                ]
+            }
+        };
+
+        const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        function openIrrigationModal() {
+            document.getElementById('irrigation-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            updateIrrigationSchedule();
+        }
+
+        function closeIrrigationModal() {
+            document.getElementById('irrigation-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function toggleCrop(btn) {
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            } else {
+                btn.classList.add('active', 'bg-blue-600', 'text-white');
+                btn.classList.remove('bg-gray-100', 'text-gray-600');
+            }
+            updateIrrigationSchedule();
+        }
+
+        function updateIrrigationSchedule() {
+            const selectedCrops = [];
+            document.querySelectorAll('.crop-btn.active').forEach(btn => {
+                selectedCrops.push(btn.dataset.crop);
+            });
+
+            if (selectedCrops.length === 0) {
+                document.getElementById('irrigation-schedule-grid').innerHTML = `
+                    <div class="col-span-7 text-center py-8 text-gray-400">
+                        <i class="fas fa-seedling text-4xl mb-3"></i>
+                        <p class="font-bold">Please select at least one crop</p>
+                    </div>
+                `;
+                document.getElementById('water-req-text').innerHTML = 'Select crops to see water requirements';
+                return;
+            }
+
+            // Combine schedules - if any crop needs water that day, show water
+            const combinedSchedule = [];
+            for (let i = 0; i < 7; i++) {
+                let needsWater = false;
+                let isSpecial = false;
+                let time = 'Skip';
+                let hour = 'Rest Day';
+
+                for (const cropName of selectedCrops) {
+                    const crop = cropSchedules[cropName];
+                    if (crop && crop.schedule[i].water) {
+                        needsWater = true;
+                        if (crop.schedule[i].special) isSpecial = true;
+                        time = crop.schedule[i].time;
+                        hour = crop.schedule[i].hour;
+                    }
+                }
+
+                combinedSchedule.push({ water: needsWater, special: isSpecial, time, hour });
+            }
+
+            // Render schedule
+            const grid = document.getElementById('irrigation-schedule-grid');
+            grid.innerHTML = combinedSchedule.map((day, idx) => {
+                if (day.special) {
+                    return `
+                        <div class="text-center p-3 bg-green-50 rounded-2xl border-2 border-green-200">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">${dayNames[idx]}</p>
+                            <div class="text-2xl my-2">🌿</div>
+                            <p class="text-xs font-black text-green-600">${day.time}</p>
+                            <p class="text-[10px] text-gray-500">${day.hour}</p>
+                        </div>
+                    `;
+                } else if (day.water) {
+                    return `
+                        <div class="text-center p-3 bg-blue-50 rounded-2xl border-2 border-blue-200">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">${dayNames[idx]}</p>
+                            <div class="text-2xl my-2">💧</div>
+                            <p class="text-xs font-black text-blue-600">${day.time}</p>
+                            <p class="text-[10px] text-gray-500">${day.hour}</p>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">${dayNames[idx]}</p>
+                            <div class="text-2xl my-2">☀️</div>
+                            <p class="text-xs font-black text-gray-400">Skip</p>
+                            <p class="text-[10px] text-gray-400">Rest Day</p>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            // Update water requirements
+            const waterReqs = selectedCrops.map(c => `${cropSchedules[c].name}: ${cropSchedules[c].waterReq}`);
+            document.getElementById('water-req-text').innerHTML = waterReqs.join('<br>');
+        }
+
+        // Reminder Functions
+        function toggleReminderSettings() {
+            const panel = document.getElementById('reminder-settings');
+            const btn = document.getElementById('reminder-btn');
+
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                btn.innerHTML = '<i class="fas fa-times mr-2"></i>Cancel';
+                btn.classList.add('bg-red-100', 'text-red-700');
+                btn.classList.remove('bg-gray-100', 'text-gray-700');
+
+                // Load saved settings
+                loadReminderSettings();
+            } else {
+                panel.classList.add('hidden');
+                btn.innerHTML = '<i class="fas fa-bell mr-2"></i>Set Reminders';
+                btn.classList.remove('bg-red-100', 'text-red-700');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            }
+        }
+
+        function loadReminderSettings() {
+            const saved = JSON.parse(localStorage.getItem('irrigation_reminders') || '{}');
+            if (saved.morningTime) document.getElementById('reminder-morning').value = saved.morningTime;
+            if (saved.eveningTime) document.getElementById('reminder-evening').value = saved.eveningTime;
+
+            const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+            days.forEach(day => {
+                const checkbox = document.getElementById(`remind-${day}`);
+                if (saved.days && saved.days[day] !== undefined) {
+                    checkbox.checked = saved.days[day];
+                }
+            });
+        }
+
+        async function saveReminders() {
+            // Request notification permission
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    showNotification('Please allow notifications to receive reminders', 'warning');
+                    return;
+                }
+            }
+
+            const morningTime = document.getElementById('reminder-morning').value;
+            const eveningTime = document.getElementById('reminder-evening').value;
+
+            const days = {
+                mon: document.getElementById('remind-mon').checked,
+                tue: document.getElementById('remind-tue').checked,
+                wed: document.getElementById('remind-wed').checked,
+                thu: document.getElementById('remind-thu').checked,
+                fri: document.getElementById('remind-fri').checked,
+                sat: document.getElementById('remind-sat').checked,
+                sun: document.getElementById('remind-sun').checked
+            };
+
+            const reminderData = {
+                morningTime,
+                eveningTime,
+                days,
+                crops: Array.from(document.querySelectorAll('.crop-btn.active')).map(b => b.dataset.crop),
+                enabled: true,
+                createdAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('irrigation_reminders', JSON.stringify(reminderData));
+
+            // Show success notification
+            showNotification('Reminders saved successfully! You will be notified on selected days.', 'success');
+
+            // Close the settings panel
+            toggleReminderSettings();
+
+            // Schedule a demo notification
+            setTimeout(() => {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('🌱 AgriSathi Irrigation Reminder', {
+                        body: 'Your irrigation reminders are now active! You will receive notifications at your scheduled times.',
+                        icon: '💧',
+                        tag: 'irrigation-demo'
+                    });
+                }
+            }, 2000);
+        }
+
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-600',
+                warning: 'bg-yellow-600',
+                error: 'bg-red-600',
+                info: 'bg-blue-600'
+            };
+
+            const notification = document.createElement('div');
+            notification.className = `fixed top-24 right-6 ${colors[type]} text-white px-6 py-3 rounded-2xl shadow-lg font-bold z-[150] animate-pulse`;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 4000);
+        }
+
+        async function initWeather() {
+            const lang = document.getElementById('lang-select').value;
+            const user = JSON.parse(localStorage.getItem('agrisathi_user'));
+
+            try {
+                let res;
+                // If user has a village/location in their profile, use it
+                if (user && user.village) {
+                    const query = `${user.village}, ${user.state || ''}`;
+                    res = await fetch(`${API_BASE}/weather/search?query=${encodeURIComponent(query)}&lang=${lang}`);
+                } else {
+                    // Fallback to default coordinates (Kerala) if no location
+                    res = await fetch(`${API_BASE}/weather/current?lat=10.8505&lon=76.2711&lang=${lang}`);
+                }
+
+                if (res.ok) {
+                    weatherData = await res.json();
+                    renderCompactWeather(weatherData);
+                } else {
+                    console.error("Weather fetch failed");
+                }
+            } catch (err) { console.error("Weather error:", err); }
+        }
+
+        async function useCurrentLocation() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser");
+                return;
+            }
+
+            const lang = document.getElementById('lang-select').value;
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    try {
+                        const res = await fetch(`${API_BASE}/weather/current?lat=${lat}&lon=${lon}&lang=${lang}`);
+                        if (res.ok) {
+                            weatherData = await res.json();
+                            renderCompactWeather(weatherData);
+
+                            // Show success notification
+                            const notification = document.createElement('div');
+                            notification.className = 'fixed top-24 right-6 bg-green-600 text-white px-6 py-3 rounded-2xl shadow-lg font-bold z-50 animate-pulse';
+                            notification.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Location updated!';
+
+                            document.body.appendChild(notification);
+                            setTimeout(() => notification.remove(), 3000);
+                        }
+                    } catch (err) {
+                        console.error("GPS Weather error:", err);
+                        alert("Failed to fetch weather for your location");
+                    }
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    alert("Unable to retrieve your location. Please enable location access.");
+                }
+            );
+        }
+
+        async function searchWeatherByLocation() {
+            const query = document.getElementById('weather-search-input').value;
+            const lang = document.getElementById('lang-select').value;
+            if (!query) return;
+
+            const btn = document.querySelector('[onclick="searchWeatherByLocation()"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/weather/search?query=${encodeURIComponent(query)}&lang=${lang}`);
+                const data = await res.json();
+                weatherData = data;
+
+                // Update basic UI
+                renderCompactWeather(data);
+                // Refresh Modal Content
+                openWeatherDetails();
+
+                document.getElementById('weather-search-input').value = '';
+            } catch (err) {
+                console.error("Search error:", err);
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+
+        // Add Enter key support for search
+        document.addEventListener('keydown', (e) => {
+            if (e.target.id === 'weather-search-input' && e.key === 'Enter') {
+                searchWeatherByLocation();
+            }
+        });
+
+        function renderCompactWeather(data) {
+            document.getElementById('weather-loc-name').innerText = data.location;
+            document.getElementById('weather-curr-temp').innerText = `${data.temp}°`;
+            document.getElementById('weather-curr-desc').innerText = data.summary;
+            document.getElementById('weather-humid').innerText = `${data.humidity}%`;
+            document.getElementById('weather-aqi').innerText = data.aqi || 'Good';
+
+            // Use Font Awesome icons based on weather condition
+            const weatherIcons = {
+                'clear': 'fa-sun',
+                'clouds': 'fa-cloud',
+                'rain': 'fa-cloud-rain',
+                'drizzle': 'fa-cloud-rain',
+                'thunderstorm': 'fa-bolt',
+                'snow': 'fa-snowflake',
+                'mist': 'fa-smog',
+                'fog': 'fa-smog',
+                'haze': 'fa-smog'
+            };
+
+            const condition = data.summary ? data.summary.toLowerCase() : 'clear';
+            let iconClass = 'fa-cloud-sun'; // default
+
+            for (const [key, value] of Object.entries(weatherIcons)) {
+                if (condition.includes(key)) {
+                    iconClass = value;
+                    break;
+                }
+            }
+
+            document.getElementById('weather-curr-icon').innerHTML = `<i class="fas ${iconClass}"></i>`;
+        }
+
+        function openWeatherDetails() {
+            if (!weatherData) return;
+            document.getElementById('weather-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            if (document.getElementById('modal-region-tag')) {
+                document.getElementById('modal-region-tag').innerText = weatherData.location;
+            }
+            document.getElementById('modal-temp').innerHTML = `${weatherData.temp}°C <span
+        class="text-[10px] font-bold ${weatherData.temp > 32 ? 'text-red-500' : 'text-green-600'}">(${weatherData.temp >
+                    32 ? 'Hot' : 'Ideal'})</span>`;
+            document.getElementById('modal-rain').innerText = `${weatherData.humidity > 70 ? 'High Chance' : 'Low Chance'}`;
+            document.getElementById('modal-wind-adv').innerText = weatherData.wind > 15 ? 'Strong' : 'Mild';
+
+            // Do/Avoid
+            const doList = document.getElementById('modal-actions-do');
+            doList.innerHTML = '';
+            weatherData.actions.do.forEach(act => {
+                doList.innerHTML += `<li class="flex items-center space-x-2 text-[11px] font-bold text-gray-600"><i
+            class="fas fa-check-circle text-green-500"></i> <span>${act}</span></li>`;
+            });
+            const avoidList = document.getElementById('modal-actions-avoid');
+            avoidList.innerHTML = '';
+            weatherData.actions.avoid.forEach(act => {
+                avoidList.innerHTML += `<li class="flex items-center space-x-2 text-[11px] font-bold text-gray-400"><i
+            class="fas fa-times-circle text-red-500"></i> <span>${act}</span></li>`;
+            });
+
+            // Best Time
+            document.getElementById('best-fertilizer').innerText = weatherData.best_time.fertilizer;
+            document.getElementById('best-spray').innerText = weatherData.best_time.spray;
+            document.getElementById('best-irrigation').innerText = weatherData.best_time.irrigation;
+
+            // Decision Table
+            const tbody = document.getElementById('decision-table-body');
+            tbody.innerHTML = '';
+            Object.values(weatherData.advisory).forEach(item => {
+                tbody.innerHTML += `
+    <tr>
+        <td class="px-6 py-3 font-bold text-gray-400">${item.param}</td>
+        <td class="px-6 py-3 font-black text-gray-700">${item.val}</td>
+        <td class="px-6 py-3"><span
+                class="px-2 py-1 rounded-lg font-black ${item.status === 'success' ? 'bg-green-100 text-green-700' : item.status === 'danger' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">${item.act}</span>
+        </td>
+    </tr>
+    `;
+            });
+
+            // Render Charts after small delay to ensure container size
+            setTimeout(() => renderCharts(weatherData.forecast), 300);
+        }
+
+        function closeWeatherDetails() {
+            document.getElementById('weather-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        let charts = {};
+        function renderCharts(forecast) {
+            if (!forecast || forecast.length === 0) {
+                console.warn("No forecast data available for charts");
+                return;
+            }
+
+            const xLabels = forecast.map(f => f.date);
+
+            const options = (name, data, color, type) => ({
+                series: [{ name: name, data: data }],
+                chart: {
+                    type: type,
+                    height: 180,
+                    toolbar: { show: false },
+                    sparkline: { enabled: false },
+                    animations: { enabled: true, easing: 'easeinout', speed: 800 }
+                },
+                stroke: { curve: 'smooth', width: 3 },
+                xaxis: {
+                    categories: xLabels,
+                    labels: { style: { fontSize: '9px', fontWeight: 700, colors: '#94a3b8' } },
+                    axisBorder: { show: false }
+                },
+                yaxis: { labels: { style: { fontSize: '9px', fontWeight: 600, colors: '#94a3b8' } } },
+                colors: [color],
+                fill: {
+                    type: 'gradient',
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [20, 100] }
+                },
+                markers: { size: 4, strokeWidth: 2, hover: { size: 6 } },
+                grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+                tooltip: { theme: 'light', x: { show: true }, style: { fontSize: '10px' } }
+            });
+
+            // Reusable render helper
+            const safeRender = (id, key, name, data, color, type) => {
+                const el = document.querySelector(id);
+                if (!el) return;
+                if (charts[key]) charts[key].destroy();
+                charts[key] = new ApexCharts(el, options(name, data, color, type));
+                charts[key].render();
+            };
+
+            safeRender("#chart-temp", "temp", "Temp", forecast.map(f => f.temp), "#f59e0b", "line");
+            safeRender("#chart-rain", "rain", "Rain", forecast.map(f => f.rain), "#3b82f6", "bar");
+            safeRender("#chart-humid", "humid", "Humidity", forecast.map(f => f.humidity), "#10b981", "area");
+            safeRender("#chart-wind", "wind", "Wind", forecast.map(f => f.wind), "#6366f1", "line");
+        }
+
+        document.getElementById('lang-select').onchange = () => {
+            localStorage.setItem('agri_lang', document.getElementById('lang-select').value);
+            updateUIForLanguage();
+            initWeather();
+        };
+
+        function updateUIForLanguage() {
+            const lang = document.getElementById('lang-select').value;
+            const welcome = {
+                "en": "Good Morning",
+                "ta": "இனிய காலை வணக்கம்",
+                "ml": "ശുഭദിനം",
+                "hi": "शुभ प्रभात"
+            };
+            const subtitle = {
+                "en": "Ready for a productive day? Local weather is updated.",
+                "ta": "இன்றைய நாள் சிறப்பாக அமையட்டும்! உள்ளூர் வானிலை அப்டேட் செய்யப்பட்டுள்ளது.",
+                "ml": "നിങ്ങളുടെ ദിവസം മനോഹരമാകട്ടെ! പ്രാദേശിക കാലാവസ്ഥ അപ്‌ഡേറ്റ് ചെയ്തിട്ടുണ്ട്.",
+                "hi": "एक उत्पादक दिन के लिए तैयार हैं? स्थानीय मौसम अपडेट किया गया है।"
+            };
+            const welcomeText = document.getElementById('welcome-text');
+            const heroSubtitle = document.getElementById('hero-subtitle');
+            if (welcomeText) welcomeText.innerText = welcome[lang] || welcome["en"];
+            if (heroSubtitle) heroSubtitle.innerText = subtitle[lang] || subtitle["en"];
+
+            const labels = {
+                "en": {
+                    "table_title": "📊 Weather → Action Intelligence",
+                    "th_param": "Parameter",
+                    "th_status": "Status",
+                    "th_action": "Recommended Action",
+                    "search_title": "🔍 Search Region",
+                    "search_btn": "Search",
+                    "search_hint": "Type your district or state to see local advisory & charts",
+                    "nav_dash": "Dashboard",
+                    "nav_assistant": "AI Assistant",
+                    "nav_crop": "Crop Planner",
+                    "nav_govt": "Govt Schemes",
+                    "nav_saved": "AgriLocker",
+                    "nav_profile": "Profile",
+                    "hero_ai": "Ask AI Sathi",
+                    "hero_crops": "View My Crops"
+                },
+                "ta": {
+                    "table_title": "📊 வானிலை → தகவல் நுண்ணறிவு",
+                    "th_param": "அளவுரு",
+                    "th_status": "நிலை",
+                    "th_action": "பரிந்துரைக்கப்பட்ட நடவடிக்கை",
+                    "search_title": "🔍 பகுதியைத் தேடுங்கள்",
+                    "search_btn": "தேடு",
+                    "search_hint": "உள்ளூர் ஆலோசனைகளைக் காண உங்கள் மாவட்டம் அல்லது மாநிலத்தைத் தட்டச்சு செய்யவும்",
+                    "nav_dash": "முதன்மை பக்கம்",
+                    "nav_assistant": "AI உதவியாளர்",
+                    "nav_crop": "பயிர் ஆலோசகர்",
+                    "nav_govt": "அரசு திட்டங்கள்",
+                    "nav_saved": "சேமிக்கப்பட்டவை",
+                    "nav_profile": "சுயவிவரம்",
+                    "hero_ai": "AI சாதியிடம் கேளுங்கள்",
+                    "hero_crops": "எனது பயிர்கள்"
+                },
+                "ml": {
+                    "table_title": "📊 കാലാവസ്ഥ → നടപടി ക്രമങ്ങൾ",
+                    "th_param": "ഘടകം",
+                    "th_status": "നില",
+                    "th_action": "ശുപാർശ ചെയ്യുന്ന നടപടി",
+                    "search_title": "🔍 പ്രദേശം തിരയുക",
+                    "search_btn": "തിരയുക",
+                    "search_hint": "പ്രാദേശിക വിവരങ്ങൾ കാണുന്നതിന് നിങ്ങളുടെ ജില്ലയോ സംസ്ഥാനമോ ടൈപ്പ് ചെയ്യുക",
+                    "nav_dash": "ഡാഷ്‌ബോർഡ്",
+                    "nav_assistant": "AI സഹായി",
+                    "nav_crop": "വിള ഉപദേശകൻ",
+                    "nav_govt": "സർക്കാർ പദ്ധതികൾ",
+                    "nav_saved": "AgriLocker",
+                    "nav_profile": "പ്രൊഫൈൽ",
+                    "hero_ai": "AI സാധിയോട് ചോദിക്കുക",
+                    "hero_crops": "വിളകൾ കാണുക"
+                },
+                "hi": {
+                    "table_title": "📊 मौसम → कृषि बुद्धिमत्ता",
+                    "th_param": "पैरामीटर",
+                    "th_status": "स्थिति",
+                    "th_action": "अनुशंसित कार्रवाई",
+                    "search_title": "🔍 क्षेत्र खोजें",
+                    "search_btn": "खोजें",
+                    "search_hint": "स्थानीय सलाह देखने के लिए अपना जिला या राज्य टाइप करें",
+                    "nav_dash": "मुख्य पृष्ठ",
+                    "nav_assistant": "AI सहायक",
+                    "nav_crop": "फसल सलाहकार",
+                    "nav_govt": "सरकारी योजनाएं",
+                    "nav_saved": "एग्रीलॉकर",
+                    "nav_profile": "प्रोफाइल",
+                    "hero_ai": "AI साथी से पूछें",
+                    "hero_crops": "मेरी फसलें"
+                }
+            };
+            const l = labels[lang] || labels["en"];
+            document.getElementById('modal-table-title').innerText = l.table_title;
+            document.getElementById('th-param').innerText = l.th_param;
+            document.getElementById('th-status').innerText = l.th_status;
+            document.getElementById('th-action').innerText = l.th_action;
+            document.getElementById('search-title').innerText = l.search_title;
+            if (document.getElementById('search-btn')) document.getElementById('search-btn').querySelector('span').innerText =
+                l.search_btn;
+            if (document.getElementById('search-hint')) document.getElementById('search-hint').innerText = l.search_hint;
+
+            document.getElementById('nav-dash').innerText = l.nav_dash;
+            document.getElementById('nav-assistant').innerText = l.nav_assistant;
+            document.getElementById('nav-crop').innerText = l.nav_crop;
+            document.getElementById('nav-govt').innerText = l.nav_govt;
+            document.getElementById('nav-saved').innerText = l.nav_saved;
+            document.getElementById('nav-profile').innerText = l.nav_profile;
+            document.getElementById('hero-btn-ai').innerText = l.hero_ai;
+            document.getElementById('hero-btn-crops').innerText = l.hero_crops;
+        }
+
+        // Initialize language from storage
+        const savedLang = localStorage.getItem('agri_lang');
+        if (savedLang) {
+            document.getElementById('lang-select').value = savedLang;
+        }
+        updateUIForLanguage();
+
+        function logout() {
+            localStorage.removeItem('agrisathi_user');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

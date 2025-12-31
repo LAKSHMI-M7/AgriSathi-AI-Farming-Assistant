@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List with Progress</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #e2e6ea;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    /* Progress bar styles */
+    .progress-container {
+      margin-top: 20px;
+    }
+
+    .progress-bar {
+      height: 20px;
+      background: #28a745;
+      width: 0%;
+      border-radius: 10px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .progress-wrapper {
+      background: #ccc;
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>To-Do List with Progress</h2>
+
+    <input type="text" id="task-title" placeholder="Task Title">
+    <textarea id="task-desc" placeholder="Task Description"></textarea>
+    <input type="datetime-local" id="task-date">
+    <select id="task-priority">
+      <option>Low</option>
+      <option>Medium</option>
+      <option>High</option>
+      <option>Urgent</option>
+    </select>
+    <input type="text" id="task-category" placeholder="Category/Tags">
+    <button onclick="addTask()">Add Task</button>
+
+    <div class="progress-container">
+      <p><strong>Progress</strong></p>
+      <div class="progress-wrapper">
+        <div class="progress-bar" id="progress-bar">0%</div>
+      </div>
+    </div>
+
+    <h3>Your Tasks</h3>
+    <ul id="task-list"></ul>
+  </div>
+
+  <script>
+    function addTask() {
+      let title = document.getElementById("task-title").value;
+      let desc = document.getElementById("task-desc").value;
+      let date = document.getElementById("task-date").value;
+      let priority = document.getElementById("task-priority").value;
+      let category = document.getElementById("task-category").value;
+
+      if (title === "") {
+        alert("Please enter a task title.");
+        return;
+      }
+
+      let taskList = document.getElementById("task-list");
+      let li = document.createElement("li");
+
+      li.innerHTML = `<span><strong>${title}</strong><br>${desc}<br>
+        <small>${date} | ${priority} | ${category}</small></span>
+        <div>
+          <button onclick="markDone(this)">✔</button>
+          <button onclick="deleteTask(this)">✖</button>
+        </div>`;
+
+      taskList.appendChild(li);
+
+      clearFields();
+      updateProgress();
+    }
+
+    function markDone(btn) {
+      let li = btn.parentElement.parentElement;
+      li.classList.toggle("completed");
+      updateProgress();
+    }
+
+    function deleteTask(btn) {
+      let li = btn.parentElement.parentElement;
+      li.remove();
+      updateProgress();
+    }
+
+    function clearFields() {
+      document.getElementById("task-title").value = "";
+      document.getElementById("task-desc").value = "";
+      document.getElementById("task-date").value = "";
+      document.getElementById("task-priority").value = "Low";
+      document.getElementById("task-category").value = "";
+    }
+
+    function updateProgress() {
+      let allTasks = document.querySelectorAll("#task-list li");
+      let completedTasks = document.querySelectorAll("#task-list li.completed");
+      let total = allTasks.length;
+      let done = completedTasks.length;
+      let percent = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      let progressBar = document.getElementById("progress-bar");
+      progressBar.style.width = percent + "%";
+      progressBar.innerText = percent + "%";
+    }
+  </script>
+
+</body>
+</html>

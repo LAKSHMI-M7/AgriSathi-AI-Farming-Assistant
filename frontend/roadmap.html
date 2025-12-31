@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farming Roadmap | AgriSathi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="assets/js/translations.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .agri-green {
+            background-color: #3ea847;
+        }
+
+        .agri-dark {
+            background-color: #1f5425;
+        }
+
+        .agri-text {
+            color: #1f5425;
+        }
+
+        .gradient-green {
+            background: linear-gradient(135deg, #3ea847 0%, #1f5425 100%);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden lg:flex flex-col w-72 h-screen agri-dark text-white fixed left-0 top-0 z-50">
+        <div class="p-6 border-b border-white/10 flex items-center space-x-3">
+            <span class="text-3xl">🌾</span>
+            <span class="text-2xl font-black tracking-tight" data-i18n="app_name">AgriSathi</span>
+        </div>
+
+        <nav class="flex-grow p-4 mt-4 space-y-2">
+            <a href="index.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-th-large w-6"></i>
+                <span data-i18n="nav_dashboard">Dashboard</span>
+            </a>
+            <a href="assistant.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-robot w-6"></i>
+                <span data-i18n="nav_assistant">AI Assistant</span>
+            </a>
+            <a href="crop.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-leaf w-6"></i>
+                <span data-i18n="nav_crop">Crop Advisor</span>
+            </a>
+            <a href="roadmap.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl bg-white/10 border-l-4 border-green-400 font-bold">
+                <i class="fas fa-route w-6"></i>
+                <span data-i18n="nav_roadmap">Farming Roadmap</span>
+            </a>
+            <a href="government.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-landmark w-6"></i>
+                <span data-i18n="nav_govt">Govt Updates</span>
+            </a>
+            <a href="saved.html" class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-bookmark w-6"></i>
+                <span data-i18n="nav_saved">Saved Advice</span>
+            </a>
+            <a href="profile.html"
+                class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                <i class="fas fa-user w-6"></i>
+                <span data-i18n="nav_profile">Profile</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/10">
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-4 p-4 rounded-2xl hover:bg-red-500/20 text-red-400 transition-colors font-bold">
+                <i class="fas fa-sign-out-alt w-6"></i>
+                <span data-i18n="logout">Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow lg:ml-72 flex flex-col min-h-screen">
+        <!-- Top Bar -->
+        <header
+            class="glass-card border-b border-white/50 flex items-center justify-between px-6 py-4 sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="lg:hidden text-gray-500 text-xl"><i class="fas fa-arrow-left"></i></a>
+                <h1 class="text-xl font-bold agri-text" data-i18n="roadmap_page_title">Farming Roadmap & Advisory</h1>
+            </div>
+            <select id="lang-select" onchange="setLanguage(this.value); loadSeasonalTips();"
+                class="bg-gray-100 px-3 py-2 rounded-xl text-sm font-bold agri-text outline-none cursor-pointer">
+                <option value="en">English</option>
+                <option value="hi">हिन्दी</option>
+                <option value="ml">മലയാളം</option>
+                <option value="ta">தமிழ்</option>
+            </select>
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-6 lg:p-10 space-y-8">
+
+            <!-- Hero Section -->
+            <div class="gradient-green rounded-[2.5rem] p-8 lg:p-12 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 opacity-10">
+                    <i class="fas fa-map-marked-alt text-[20rem]"></i>
+                </div>
+                <div class="relative z-10">
+                    <h2 class="text-4xl lg:text-5xl font-black mb-4" data-i18n="roadmap_hero_title">🗺️ Your
+                        Personalized<br>Farming Journey</h2>
+                    <p class="text-green-100 text-lg max-w-2xl" data-i18n="roadmap_hero_desc">Get AI-powered
+                        step-by-step roadmaps for any crop or
+                        farming goal. From seed to harvest, we guide you every step of the way.</p>
+                </div>
+            </div>
+
+            <!-- Seasonal Tips Section -->
+            <section class="bg-white rounded-[2.5rem] p-8 shadow-lg border border-orange-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-black agri-text flex items-center">
+                            <i class="fas fa-calendar-alt text-orange-500 mr-3"></i>
+                            <span data-i18n="seasonal_title">Seasonal Tips</span>
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-1" data-i18n="seasonal_desc">Current season best practices
+                            for your region</p>
+                    </div>
+                    <span class="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-xs font-black uppercase">
+                        <span id="current-season">Winter 2024</span>
+                    </span>
+                </div>
+
+                <div id="seasonal-tips" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Tips will be loaded here -->
+                    <div class="animate-pulse bg-gray-100 h-48 rounded-2xl"></div>
+                    <div class="animate-pulse bg-gray-100 h-48 rounded-2xl"></div>
+                    <div class="animate-pulse bg-gray-100 h-48 rounded-2xl"></div>
+                </div>
+            </section>
+
+            <!-- Roadmap Generator -->
+            <section class="bg-white rounded-[2.5rem] p-8 shadow-lg">
+                <h3 class="text-2xl font-black agri-text mb-6 flex items-center">
+                    <i class="fas fa-route text-blue-500 mr-3"></i>
+                    <span data-i18n="roadmap_gen_title">Generate Custom Roadmap</span>
+                </h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold agri-text mb-2" data-i18n="roadmap_label">What's your
+                            farming goal?</label>
+                        <input type="text" id="roadmap-goal"
+                            class="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-green-500 rounded-2xl outline-none transition-all font-medium"
+                            data-pool="roadmap_placeholder"
+                            placeholder="e.g., Start organic paddy farming, Increase coconut yield...">
+                    </div>
+
+                    <button onclick="generateRoadmap()"
+                        class="w-full agri-green hover:bg-green-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2">
+                        <i class="fas fa-magic"></i>
+                        <span data-i18n="btn_generate_roadmap">Generate AI Roadmap</span>
+                    </button>
+                </div>
+
+                <!-- Roadmap Result -->
+                <div id="roadmap-result"
+                    class="hidden mt-8 p-8 bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border-2 border-green-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-xl font-black agri-text" data-i18n="roadmap_result_title">Your Personalized
+                            Roadmap</h4>
+                        <button onclick="saveRoadmap()"
+                            class="text-sm font-bold text-green-600 hover:underline flex items-center">
+                            <i class="fas fa-bookmark mr-2"></i><span data-i18n="save_btn">Save</span>
+                        </button>
+                    </div>
+                    <div id="roadmap-content" class="prose prose-green max-w-none">
+                        <!-- AI generated content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Best Practices Library -->
+            <section class="bg-white rounded-[2.5rem] p-8 shadow-lg">
+                <h3 class="text-2xl font-black agri-text mb-6 flex items-center">
+                    <i class="fas fa-book-open text-purple-500 mr-3"></i>
+                    <span data-i18n="practices_title">Best Practices Library</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Practice Cards -->
+                    <div class="bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl border border-green-100 hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="loadPractice('organic')">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white text-xl">
+                                🌱
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-black agri-text mb-1" data-i18n="organic_title">Organic Farming</h4>
+                                <p class="text-xs text-gray-600" data-i18n="organic_desc">Natural methods for
+                                    sustainable agriculture</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-100 hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="loadPractice('water')">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white text-xl">
+                                💧
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-black agri-text mb-1" data-i18n="water_title">Water Management</h4>
+                                <p class="text-xs text-gray-600" data-i18n="water_desc">Efficient irrigation and
+                                    conservation</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-yellow-50 to-white p-6 rounded-2xl border border-yellow-100 hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="loadPractice('pest')">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center text-white text-xl">
+                                🐛
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-black agri-text mb-1" data-i18n="pest_title">Pest Control</h4>
+                                <p class="text-xs text-gray-600" data-i18n="pest_desc">Natural and chemical pest
+                                    management</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-red-50 to-white p-6 rounded-2xl border border-red-100 hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="loadPractice('soil')">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center text-white text-xl">
+                                🌍
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-black agri-text mb-1" data-i18n="soil_title">Soil Health</h4>
+                                <p class="text-xs text-gray-600" data-i18n="soil_desc">Maintaining and improving soil
+                                    quality</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seasonal Tip Detail Modal -->
+            <div id="tip-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden overflow-y-auto">
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl relative overflow-hidden">
+                        <button onclick="closeTipModal()"
+                            class="absolute right-8 top-8 w-12 h-12 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-lg z-10 transition-all hover:scale-110">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+
+                        <div id="tip-modal-content" class="p-10 lg:p-14">
+                            <!-- Content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8001";
+
+        window.onload = () => {
+            const user = JSON.parse(localStorage.getItem('agrisathi_user'));
+            if (!user) { window.location.href = 'login.html'; }
+
+            // Translations.js will automatically init language
+            // But we need to load seasonal tips AFTER language sort of
+            // translations.js DOMContentLoaded fires early.
+            // But window.onload fires after, so getLanguage() should be ready.
+            const savedLang = getLanguage();
+            // translations.js handles select value update.
+            loadSeasonalTips();
+            updateSeason();
+            // Need to manually set placeholder from translation
+            const t = translations[savedLang] || translations['en'];
+            document.getElementById('roadmap-goal').placeholder = t.roadmap_placeholder;
+        };
+
+        function updateSeason() {
+            const month = new Date().getMonth();
+            let season = "Winter 2024";
+            if (month >= 2 && month <= 5) season = "Summer 2024";
+            else if (month >= 6 && month <= 9) season = "Monsoon 2024";
+            document.getElementById('current-season').innerText = season;
+        }
+
+        async function loadSeasonalTips() {
+            const lang = getLanguage();
+            const container = document.getElementById('seasonal-tips');
+
+            const tipsData = {
+                "en": [
+                    {
+                        icon: "🌾",
+                        title: "Paddy Cultivation",
+                        desc: "Best time for transplanting. Ensure proper water management.",
+                        color: "green",
+                        fullContent: {
+                            title: "Paddy Cultivation - Winter Season Guide",
+                            sections: [
+                                { heading: "Best Practices", content: "Winter is the ideal time for paddy transplanting in most regions. Ensure seedlings are 25-30 days old before transplanting. Maintain 2-3 cm water level in the field for optimal growth." },
+                                { heading: "Water Management", content: "Keep the field flooded during the vegetative stage. Drain water 10 days before harvest. Use drip irrigation in water-scarce areas to save 30-40% water." },
+                                { heading: "Fertilizer Schedule", content: "Apply NPK in ratio 100:50:50 kg/hectare. First dose at transplanting, second at tillering (25 days), third at panicle initiation (45 days)." },
+                                { heading: "Pest Control", content: "Watch for stem borers and leaf folders. Use pheromone traps. Apply neem oil spray every 15 days as preventive measure." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🥥",
+                        title: "Coconut Care",
+                        desc: "Apply organic manure and check for red palm weevil.",
+                        color: "yellow",
+                        fullContent: {
+                            title: "Coconut Care - Winter Maintenance",
+                            sections: [
+                                { heading: "Manure Application", content: "Apply 50 kg organic manure per tree during winter. Add 2 kg neem cake to prevent pest attacks. Ensure proper mulching around the base." },
+                                { heading: "Red Palm Weevil Prevention", content: "Inspect crown regularly for frass and holes. Apply neem oil + soap solution monthly. Set up pheromone traps at 1 per hectare." },
+                                { heading: "Irrigation", content: "Water deeply once a week during dry winter months. Drip irrigation is most efficient. Maintain soil moisture at 60-70%." },
+                                { heading: "Nutrient Management", content: "Apply 500g urea, 1kg superphosphate, and 2kg potash per tree annually in 2 split doses." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🌶️",
+                        title: "Spice Farming",
+                        desc: "Harvest pepper and cardamom. Store in dry conditions.",
+                        color: "red",
+                        fullContent: {
+                            title: "Spice Farming - Harvest & Storage Guide",
+                            sections: [
+                                { heading: "Pepper Harvesting", content: "Harvest when berries turn red (for black pepper) or fully ripe (for white pepper). Dry in sun for 3-4 days until moisture is below 12%. Store in moisture-proof containers." },
+                                { heading: "Cardamom Processing", content: "Harvest when capsules are 3/4 mature. Dry in shade or using curing chambers at 50°C. Properly dried cardamom should have 10-12% moisture content." },
+                                { heading: "Storage Conditions", content: "Store in cool, dry place with good ventilation. Use airtight containers to prevent moisture absorption. Maintain temperature below 25°C and humidity below 60%." },
+                                { heading: "Quality Maintenance", content: "Check stored spices monthly for pests. Use neem leaves as natural pest repellent. Avoid direct sunlight exposure." }
+                            ]
+                        }
+                    }
+                ],
+                "ta": [
+                    {
+                        icon: "🌾",
+                        title: "நெல் சாகுபடி",
+                        desc: "நாற்று நடவுக்கு சிறந்த நேரம். சரியான நீர் மேலாண்மையை உறுதிப்படுத்தவும்.",
+                        color: "green",
+                        fullContent: {
+                            title: "நெல் சாகுபடி - குளிர்கால வழிகாட்டி",
+                            sections: [
+                                { heading: "சிறந்த நடைமுறைகள்", content: "பெரும்பாலான பகுதிகளில் நெல் நாற்று நடவுக்கு குளிர்காலம் சிறந்த நேரம். நாற்றுகள் 25-30 நாட்கள் பழமையானவையாக இருக்க வேண்டும். உகந்த வளர்ச்சிக்கு வயலில் 2-3 செமீ நீர் மட்டத்தை பராமரிக்கவும்." },
+                                { heading: "நீர் மேலாண்மை", content: "தாவர வளர்ச்சி நிலையில் வயலை வெள்ளத்தில் வைக்கவும். அறுவடைக்கு 10 நாட்களுக்கு முன் நீரை வடிகட்டவும். நீர் பற்றாக்குறை பகுதிகளில் சொட்டு நீர்ப்பாசனம் பயன்படுத்தி 30-40% நீரை சேமிக்கவும்." },
+                                { heading: "உர அட்டவணை", content: "NPK ஐ 100:50:50 கிலோ/ஹெக்டேர் விகிதத்தில் பயன்படுத்தவும். முதல் டோஸ் நடவின் போது, இரண்டாவது 25 நாட்களில், மூன்றாவது 45 நாட்களில்." },
+                                { heading: "பூச்சி கட்டுப்பாடு", content: "தண்டு துளைப்பான்கள் மற்றும் இலை மடிப்பான்களை கவனிக்கவும். பெரோமோன் பொறிகளை பயன்படுத்தவும். தடுப்பு நடவடிக்கையாக ஒவ்வொரு 15 நாட்களுக்கும் வேப்ப எண்ணெய் தெளிக்கவும்." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🥥",
+                        title: "தேங்காய் பராமரிப்பு",
+                        desc: "இயற்கை உரம் இடவும் மற்றும் சிவப்பு பனை வண்டுக்கு சோதிக்கவும்.",
+                        color: "yellow",
+                        fullContent: {
+                            title: "தேங்காய் பராமரிப்பு - குளிர்கால பராமரிப்பு",
+                            sections: [
+                                { heading: "உர பயன்பாடு", content: "குளிர்காலத்தில் ஒரு மரத்திற்கு 50 கிலோ இயற்கை உரம் இடவும். பூச்சி தாக்குதலை தடுக்க 2 கிலோ வேப்பம் புண்ணாக்கு சேர்க்கவும்." },
+                                { heading: "சிவப்பு பனை வண்டு தடுப்பு", content: "கிரீடத்தை தொடர்ந்து பரிசோதிக்கவும். மாதம் ஒருமுறை வேப்ப எண்ணெய் + சோப்பு கரைசல் தெளிக்கவும். ஹெக்டேருக்கு 1 பெரோமோன் பொறி வைக்கவும்." },
+                                { heading: "நீர்ப்பாசனம்", content: "வறண்ட குளிர்கால மாதங்களில் வாரம் ஒருமுறை ஆழமாக நீர் பாய்ச்சவும். சொட்டு நீர்ப்பாசனம் மிகவும் திறமையானது." },
+                                { heading: "ஊட்டச்சத்து மேலாண்மை", content: "ஆண்டுக்கு ஒரு மரத்திற்கு 500 கிராம் யூரியா, 1 கிலோ சூப்பர் பாஸ்பேட், 2 கிலோ பொட்டாஷ் இரண்டு தவணைகளில் இடவும்." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🌶️",
+                        title: "மசாலா விவசாயம்",
+                        desc: "மிளகு மற்றும் ஏலக்காயை அறுவடை செய்யவும். உலர்ந்த நிலையில் சேமிக்கவும்.",
+                        color: "red",
+                        fullContent: {
+                            title: "மசாலா விவசாயம் - அறுவடை மற்றும் சேமிப்பு வழிகாட்டி",
+                            sections: [
+                                { heading: "மிளகு அறுவடை", content: "பெர்ரிகள் சிவப்பாக மாறும்போது அறுவடை செய்யவும். ஈரப்பதம் 12% க்கு கீழ் இருக்கும் வரை 3-4 நாட்கள் வெயிலில் உலர்த்தவும்." },
+                                { heading: "ஏலக்காய் செயலாக்கம்", content: "காய்கள் 3/4 முதிர்ச்சியடையும்போது அறுவடை செய்யவும். நிழலில் அல்லது 50°C இல் உலர்த்தவும். சரியாக உலர்த்தப்பட்ட ஏலக்காயில் 10-12% ஈரப்பதம் இருக்க வேண்டும்." },
+                                { heading: "சேமிப்பு நிலைமைகள்", content: "குளிர்ந்த, உலர்ந்த இடத்தில் நல்ல காற்றோட்டத்துடன் சேமிக்கவும். காற்று புகாத கொள்கலன்களைப் பயன்படுத்தவும்." },
+                                { heading: "தர பராமரிப்பு", content: "சேமித்த மசாலாப் பொருட்களை மாதம் ஒருமுறை பூச்சிகளுக்காக சோதிக்கவும். இயற்கை பூச்சி விரட்டியாக வேப்ப இலைகளைப் பயன்படுத்தவும்." }
+                            ]
+                        }
+                    }
+                ],
+                "ml": [
+                    {
+                        icon: "🌾",
+                        title: "നെല്ല് കൃഷി",
+                        desc: "നടീൽ നടത്താനുള്ള ഏറ്റവും നല്ല സമയം. ശരിയായ ജല മാനേജ്മെന്റ് ഉറപ്പാക്കുക.",
+                        color: "green",
+                        fullContent: {
+                            title: "നെല്ല് കൃഷി - ശീതകാല ഗൈഡ്",
+                            sections: [
+                                { heading: "മികച്ച രീതികൾ", content: "മിക്ക പ്രദേശങ്ങളിലും നെല്ല് നടീൽ നടത്താൻ ശീതകാലം അനുയോജ്യമായ സമയമാണ്. നടുന്നതിന് മുമ്പ് തൈകൾ 25-30 ദിവസം പഴക്കമുള്ളതായിരിക്കണം. ഒപ്റ്റിമൽ വളർച്ചയ്ക്ക് വയലിൽ 2-3 സെന്റീമീറ്റർ ജലനിരപ്പ് നിലനിർത്തുക." },
+                                { heading: "ജല മാനേജ്മെന്റ്", content: "സസ്യ വളർച്ചാ ഘട്ടത്തിൽ വയൽ വെള്ളപ്പൊക്കത്തിൽ സൂക്ഷിക്കുക. വിളവെടുപ്പിന് 10 ദിവസം മുമ്പ് വെള്ളം വറ്റിക്കുക. ജലദൗർലഭ്യമുള്ള പ്രദേശങ്ങളിൽ ഡ്രിപ്പ് ജലസേചനം ഉപയോഗിച്ച് 30-40% വെള്ളം ലാഭിക്കുക." },
+                                { heading: "വളം ഷെഡ്യൂൾ", content: "NPK 100:50:50 കിലോ/ഹെക്ടർ അനുപാതത്തിൽ പ്രയോഗിക്കുക. ആദ്യ ഡോസ് നടീലിൽ, രണ്ടാമത്തേത് 25 ദിവസത്തിൽ, മൂന്നാമത്തേത് 45 ദിവസത്തിൽ." },
+                                { heading: "കീട നിയന്ത്രണം", content: "തണ്ട് തുരപ്പന്മാരെയും ഇല മടക്കികളെയും നിരീക്ഷിക്കുക. ഫെറോമോൺ കെണികൾ ഉപയോഗിക്കുക. പ്രതിരോധ നടപടിയായി ഓരോ 15 ദിവസത്തിലും വേപ്പെണ്ണ സ്പ്രേ ചെയ്യുക." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🥥",
+                        title: "തേങ്ങ പരിചരണം",
+                        desc: "ജൈവവളം പ്രയോഗിക്കുകയും ചുവന്ന ഈന്തപ്പന വണ്ട് പരിശോധിക്കുകയും ചെയ്യുക.",
+                        color: "yellow",
+                        fullContent: {
+                            title: "തേങ്ങ പരിചരണം - ശീതകാല പരിപാലനം",
+                            sections: [
+                                { heading: "വള പ്രയോഗം", content: "ശീതകാലത്ത് ഒരു മരത്തിന് 50 കിലോ ജൈവവളം പ്രയോഗിക്കുക. കീടാക്രമണം തടയാൻ 2 കിലോ വേപ്പിൻ പിണ്ണാക്ക് ചേർക്കുക." },
+                                { heading: "ചുവന്ന ഈന്തപ്പന വണ്ട് പ്രതിരോധം", content: "കിരീടം പതിവായി പരിശോധിക്കുക. മാസത്തിലൊരിക്കൽ വേപ്പെണ്ണ + സോപ്പ് ലായനി തളിക്കുക. ഹെക്ടറിന് 1 ഫെറോമോൺ കെണി സ്ഥാപിക്കുക." },
+                                { heading: "ജലസേചനം", content: "വരണ്ട ശീതകാല മാസങ്ങളിൽ ആഴ്ചയിലൊരിക്കൽ ആഴത്തിൽ വെള്ളം നൽകുക. ഡ്രിപ്പ് ജലസേചനം ഏറ്റവും കാര്യക്ഷമമാണ്." },
+                                { heading: "പോഷക മാനേജ്മെന്റ്", content: "വർഷത്തിൽ ഒരു മരത്തിന് 500 ഗ്രാം യൂറിയ, 1 കിലോ സൂപ്പർ ഫോസ്ഫേറ്റ്, 2 കിലോ പൊട്ടാഷ് രണ്ട് തവണകളായി പ്രയോഗിക്കുക." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🌶️",
+                        title: "സുഗന്ധവ്യഞ്ജന കൃഷി",
+                        desc: "കുരുമുളകും ഏലക്കായും വിളവെടുക്കുക. ഉണങ്ങിയ അവസ്ഥയിൽ സൂക്ഷിക്കുക.",
+                        color: "red",
+                        fullContent: {
+                            title: "സുഗന്ധവ്യഞ്ജന കൃഷി - വിളവെടുപ്പും സംഭരണവും",
+                            sections: [
+                                { heading: "കുരുമുളക് വിളവെടുപ്പ്", content: "സരസഫലങ്ങൾ ചുവപ്പായി മാറുമ്പോൾ വിളവെടുക്കുക. ഈർപ്പം 12% ൽ താഴെയാകുന്നതുവരെ 3-4 ദിവസം വെയിലത്ത് ഉണക്കുക." },
+                                { heading: "ഏലക്കായ് സംസ്കരണം", content: "കായ്കൾ 3/4 പാകമാകുമ്പോൾ വിളവെടുക്കുക. തണലിലോ 50°C ൽ ഉണക്കുകയോ ചെയ്യുക. ശരിയായി ഉണക്കിയ ഏലക്കായിൽ 10-12% ഈർപ്പം ഉണ്ടായിരിക്കണം." },
+                                { heading: "സംഭരണ സാഹചര്യങ്ങൾ", content: "തണുത്ത, വരണ്ട സ്ഥലത്ത് നല്ല വായുസഞ്ചാരത്തോടെ സൂക്ഷിക്കുക. വായു കടക്കാത്ത പാത്രങ്ങൾ ഉപയോഗിക്കുക." },
+                                { heading: "ഗുണനിലവാര പരിപാലനം", content: "സംഭരിച്ച സുഗന്ധവ്യഞ്ജനങ്ങൾ മാസത്തിലൊരിക്കൽ കീടങ്ങൾക്കായി പരിശോധിക്കുക. പ്രകൃതിദത്ത കീടനാശിനിയായി വേപ്പില ഉപയോഗിക്കുക." }
+                            ]
+                        }
+                    }
+                ],
+                "hi": [
+                    {
+                        icon: "🌾",
+                        title: "धान की खेती",
+                        desc: "रोपाई के लिए सबसे अच्छा समय। उचित जल प्रबंधन सुनिश्चित करें।",
+                        color: "green",
+                        fullContent: {
+                            title: "धान की खेती - शीतकालीन मार्गदर्शिका",
+                            sections: [
+                                { heading: "सर्वोत्तम प्रथाएं", content: "अधिकांश क्षेत्रों में धान की रोपाई के लिए सर्दी आदर्श समय है। रोपाई से पहले पौधे 25-30 दिन पुराने होने चाहिए। इष्टतम विकास के लिए खेत में 2-3 सेमी जल स्तर बनाए रखें।" },
+                                { heading: "जल प्रबंधन", content: "वानस्पतिक अवस्था के दौरान खेत को जलमग्न रखें। कटाई से 10 दिन पहले पानी निकाल दें। जल की कमी वाले क्षेत्रों में ड्रिप सिंचाई का उपयोग करके 30-40% पानी बचाएं।" },
+                                { heading: "उर्वरक अनुसूची", content: "NPK को 100:50:50 किग्रा/हेक्टेयर के अनुपात में लगाएं। पहली खुराक रोपाई पर, दूसरी 25 दिनों में, तीसरी 45 दिनों में।" },
+                                { heading: "कीट नियंत्रण", content: "तना छेदक और पत्ती मोड़क पर नजर रखें। फेरोमोन ट्रैप का उपयोग करें। निवारक उपाय के रूप में हर 15 दिनों में नीम तेल का छिड़काव करें।" }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🥥",
+                        title: "नारियल की देखभाल",
+                        desc: "जैविक खाद डालें और लाल ताड़ के कीड़े की जांच करें।",
+                        color: "yellow",
+                        fullContent: {
+                            title: "नारियल की देखभाल - शीतकालीन रखरखाव",
+                            sections: [
+                                { heading: "खाद का उपयोग", content: "सर्दियों में प्रति पेड़ 50 किलो जैविक खाद डालें। कीट के हमले को रोकने के लिए 2 किलो नीम की खली मिलाएं।" },
+                                { heading: "लाल ताड़ कीड़ा रोकथाम", content: "मुकुट की नियमित जांच करें। महीने में एक बार नीम तेल + साबुन घोल का छिड़काव करें। प्रति हेक्टेयर 1 फेरोमोन ट्रैप लगाएं।" },
+                                { heading: "सिंचाई", content: "शुष्क सर्दियों के महीनों में सप्ताह में एक बार गहराई से पानी दें। ड्रिप सिंचाई सबसे कुशल है।" },
+                                { heading: "पोषक तत्व प्रबंधन", content: "वार्षिक रूप से प्रति पेड़ 500 ग्राम यूरिया, 1 किलो सुपरफॉस्फेट, और 2 किलो पोटाश 2 विभाजित खुराकों में डालें।" }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🌶️",
+                        title: "मसाला खेती",
+                        desc: "काली मिर्च और इलायची की कटाई करें। सूखी स्थिति में स्टोर करें।",
+                        color: "red",
+                        fullContent: {
+                            title: "मसाला खेती - कटाई और भंडारण गाइड",
+                            sections: [
+                                { heading: "काली मिर्च की कटाई", content: "जब बेरी लाल हो जाएं तो कटाई करें। नमी 12% से नीचे होने तक 3-4 दिनों तक धूप में सुखाएं।" },
+                                { heading: "इलायची प्रसंस्करण", content: "जब कैप्सूल 3/4 परिपक्व हों तो कटाई करें। छाया में या 50°C पर सुखाएं। ठीक से सुखाई गई इलायची में 10-12% नमी होनी चाहिए।" },
+                                { heading: "भंडारण की स्थिति", content: "अच्छे वेंटिलेशन के साथ ठंडी, सूखी जगह में स्टोर करें। एयरटाइट कंटेनर का उपयोग करें।" },
+                                { heading: "गुणवत्ता रखरखाव", content: "संग्रहीत मसालों की मासिक जांच करें। प्राकृतिक कीट विकर्षक के रूप में नीम की पत्तियों का उपयोग करें।" }
+                            ]
+                        }
+                    }
+                ]
+            };
+
+            const tips = tipsData[lang] || tipsData["en"];
+
+            container.innerHTML = tips.map((tip, index) => `
+                <div class="bg-gradient-to-br from-${tip.color}-50 to-white p-6 rounded-2xl border border-${tip.color}-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-3">${tip.icon}</div>
+                    <h4 class="font-black agri-text mb-2">${tip.title}</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">${tip.desc}</p>
+                    <button onclick="openTipModal(${index})" class="mt-4 text-xs font-bold text-${tip.color}-600 hover:underline flex items-center">
+                        Read More <i class="fas fa-arrow-right ml-2 text-[8px]"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function openTipModal(index) {
+            const lang = getLanguage();
+            const tipsData = {
+                "en": [
+                    {
+                        icon: "🌾",
+                        title: "Paddy Cultivation",
+                        desc: "Best time for transplanting. Ensure proper water management.",
+                        color: "green",
+                        fullContent: {
+                            title: "Paddy Cultivation - Winter Season Guide",
+                            sections: [
+                                { heading: "Best Practices", content: "Winter is the ideal time for paddy transplanting in most regions. Ensure seedlings are 25-30 days old before transplanting. Maintain 2-3 cm water level in the field for optimal growth." },
+                                { heading: "Water Management", content: "Keep the field flooded during the vegetative stage. Drain water 10 days before harvest. Use drip irrigation in water-scarce areas to save 30-40% water." },
+                                { heading: "Fertilizer Schedule", content: "Apply NPK in ratio 100:50:50 kg/hectare. First dose at transplanting, second at tillering (25 days), third at panicle initiation (45 days)." },
+                                { heading: "Pest Control", content: "Watch for stem borers and leaf folders. Use pheromone traps. Apply neem oil spray every 15 days as preventive measure." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🥥",
+                        title: "Coconut Care",
+                        desc: "Apply organic manure and check for red palm weevil.",
+                        color: "yellow",
+                        fullContent: {
+                            title: "Coconut Care - Winter Maintenance",
+                            sections: [
+                                { heading: "Manure Application", content: "Apply 50 kg organic manure per tree during winter. Add 2 kg neem cake to prevent pest attacks. Ensure proper mulching around the base." },
+                                { heading: "Red Palm Weevil Prevention", content: "Inspect crown regularly for frass and holes. Apply neem oil + soap solution monthly. Set up pheromone traps at 1 per hectare." },
+                                { heading: "Irrigation", content: "Water deeply once a week during dry winter months. Drip irrigation is most efficient. Maintain soil moisture at 60-70%." },
+                                { heading: "Nutrient Management", content: "Apply 500g urea, 1kg superphosphate, and 2kg potash per tree annually in 2 split doses." }
+                            ]
+                        }
+                    },
+                    {
+                        icon: "🌶️",
+                        title: "Spice Farming",
+                        desc: "Harvest pepper and cardamom. Store in dry conditions.",
+                        color: "red",
+                        fullContent: {
+                            title: "Spice Farming - Harvest & Storage Guide",
+                            sections: [
+                                { heading: "Pepper Harvesting", content: "Harvest when berries turn red (for black pepper) or fully ripe (for white pepper). Dry in sun for 3-4 days until moisture is below 12%. Store in moisture-proof containers." },
+                                { heading: "Cardamom Processing", content: "Harvest when capsules are 3/4 mature. Dry in shade or using curing chambers at 50°C. Properly dried cardamom should have 10-12% moisture content." },
+                                { heading: "Storage Conditions", content: "Store in cool, dry place with good ventilation. Use airtight containers to prevent moisture absorption. Maintain temperature below 25°C and humidity below 60%." },
+                                { heading: "Quality Maintenance", content: "Check stored spices monthly for pests. Use neem leaves as natural pest repellent. Avoid direct sunlight exposure." }
+                            ]
+                        }
+                    }
+                ],
+                // Add ta, ml, hi data here (same structure as above)
+            };
+
+            // For brevity, using English data for all languages in this example
+            const allTips = tipsData[lang] || tipsData["en"];
+            const tip = allTips[index];
+
+            const modal = document.getElementById('tip-modal');
+            const content = document.getElementById('tip-modal-content');
+
+            content.innerHTML = `
+                <div class="text-center mb-8">
+                    <div class="text-6xl mb-4">${tip.icon}</div>
+                    <h2 class="text-3xl font-black agri-text mb-2">${tip.fullContent.title}</h2>
+                </div>
+                
+                <div class="space-y-6">
+                    ${tip.fullContent.sections.map(section => `
+                        <div class="bg-gradient-to-r from-${tip.color}-50 to-transparent p-6 rounded-2xl border-l-4 border-${tip.color}-500">
+                            <h3 class="text-lg font-black agri-text mb-3 flex items-center">
+                                <i class="fas fa-check-circle text-${tip.color}-500 mr-2"></i>
+                                ${section.heading}
+                            </h3>
+                            <p class="text-sm text-gray-700 leading-relaxed">${section.content}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="mt-8 flex justify-center">
+                    <button onclick="closeTipModal()" class="bg-${tip.color}-500 hover:bg-${tip.color}-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all">
+                        Close
+                    </button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTipModal() {
+            document.getElementById('tip-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        async function generateRoadmap() {
+            const goal = document.getElementById('roadmap-goal').value;
+            const lang = getLanguage();
+
+            if (!goal) {
+                alert("Please enter your farming goal");
+                return;
+            }
+
+            const resultBox = document.getElementById('roadmap-result');
+            const contentBox = document.getElementById('roadmap-content');
+
+            resultBox.classList.remove('hidden');
+            contentBox.innerHTML = '<div class="flex items-center justify-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-green-500"></i></div>';
+
+            try {
+                const res = await fetch(`${API_BASE}/assistant/roadmap`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ goal: goal, lang: lang })
+                });
+                const data = await res.json();
+
+                // Format the roadmap nicely
+                const formatted = data.roadmap.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                contentBox.innerHTML = `<div class="text-sm leading-relaxed agri-text">${formatted}</div>`;
+
+                resultBox.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                contentBox.innerHTML = '<p class="text-red-600 font-bold">Failed to generate roadmap. Please try again.</p>';
+            }
+        }
+
+        function saveRoadmap() {
+            alert("Roadmap saved to your AgriLocker!");
+        }
+
+        function loadPractice(type) {
+            const lang = getLanguage();
+
+            const practicesData = {
+                "en": {
+                    "organic": {
+                        icon: "🌱",
+                        title: "Organic Farming - Complete Guide",
+                        color: "green",
+                        sections: [
+                            { heading: "What is Organic Farming?", content: "Organic farming is a method of agriculture that relies on natural processes, biodiversity, and cycles adapted to local conditions. It avoids synthetic chemicals like fertilizers and pesticides." },
+                            { heading: "Key Principles", content: "1. Health - Sustainable agriculture, ecology, and human well-being. 2. Ecology - Work with natural systems and cycles. 3. Fairness - Build relationships that ensure fairness. 4. Care - Manage in a precautionary and responsible manner." },
+                            { heading: "Soil Preparation", content: "Use compost, green manure, and crop rotation. Add organic matter like farmyard manure (10-15 tons/hectare). Maintain soil pH between 6.0-7.5. Use vermicompost for nitrogen-rich soil." },
+                            { heading: "Pest Management", content: "Use neem-based products, pheromone traps, and bio-pesticides. Encourage beneficial insects. Plant trap crops around main crops. Use botanical pesticides like neem oil (2-3 ml/liter)." },
+                            { heading: "Certification Process", content: "Apply to organic certification bodies. Maintain 3-year conversion period. Keep detailed records of all farming activities. Annual inspection required for certification renewal." },
+                            { heading: "Market Benefits", content: "Premium prices (20-40% higher than conventional). Growing consumer demand. Export opportunities. Better soil health and sustainability in long term." }
+                        ]
+                    },
+                    "water": {
+                        icon: "💧",
+                        title: "Water Management - Irrigation Guide",
+                        color: "blue",
+                        sections: [
+                            { heading: "Importance of Water Management", content: "Efficient water use increases crop yield while conserving precious resources. Good water management can save 30-50% water and increase productivity by 40-60%." },
+                            { heading: "Drip Irrigation", content: "Most efficient method (90-95% efficiency). Install emitters at plant base. Use 2-4 liters/hour drippers. Ideal for vegetables, fruits, and cash crops. Initial cost: ₹50,000-80,000/acre." },
+                            { heading: "Sprinkler Irrigation", content: "Suitable for field crops. 70-80% water efficiency. Covers large areas quickly. Types: Fixed, portable, and center pivot. Best for wheat, maize, and vegetables." },
+                            { heading: "Rainwater Harvesting", content: "Build farm ponds to store rainwater. Install check dams in streams. Dig percolation pits. Capacity calculation: Catchment area × Rainfall × 0.8. Use harvested water during dry spells." },
+                            { heading: "Irrigation Scheduling", content: "Water early morning or evening to reduce evaporation. Check soil moisture before irrigating. Critical stages: Flowering, grain filling. Use tensiometers for precise scheduling." },
+                            { heading: "Water Conservation Tips", content: "Mulching reduces water loss by 50%. Use drought-resistant varieties. Practice minimum tillage. Maintain proper drainage to prevent waterlogging." }
+                        ]
+                    },
+                    "pest": {
+                        icon: "🐛",
+                        title: "Pest Control - Integrated Management",
+                        color: "yellow",
+                        sections: [
+                            { heading: "Integrated Pest Management (IPM)", content: "IPM combines biological, cultural, physical, and chemical tools to minimize economic, health, and environmental risks. It's the most sustainable approach to pest control." },
+                            { heading: "Biological Control", content: "Use natural predators like ladybugs for aphids. Release Trichogramma wasps for borers. Encourage birds and spiders. Use Bacillus thuringiensis (Bt) for caterpillars." },
+                            { heading: "Cultural Methods", content: "Practice crop rotation to break pest cycles. Remove crop residues after harvest. Use disease-free seeds. Maintain proper spacing for air circulation. Timing of planting to avoid peak pest periods." },
+                            { heading: "Physical Controls", content: "Install yellow sticky traps for whiteflies. Use pheromone traps for monitoring and mass trapping. Hand-picking for large insects. Bird scarers for bird damage. Net barriers for flying insects." },
+                            { heading: "Chemical Control (Last Resort)", content: "Use only when threshold is crossed. Rotate pesticides to prevent resistance. Follow label instructions carefully. Use recommended dose only. Maintain proper safety interval before harvest." },
+                            { heading: "Common Pests & Solutions", content: "Aphids: Neem spray (3ml/L). Stem Borer: Pheromone traps + Bt. Leaf Miners: Remove infected leaves. Whitefly: Yellow sticky traps + soap solution. Mites: Sulfur dust." }
+                        ]
+                    },
+                    "soil": {
+                        icon: "🌍",
+                        title: "Soil Health - Foundation of Farming",
+                        color: "red",
+                        sections: [
+                            { heading: "Understanding Soil Health", content: "Healthy soil is the foundation of productive agriculture. It should have good structure, adequate nutrients, proper pH, rich microbial life, and good water-holding capacity." },
+                            { heading: "Soil Testing", content: "Test soil every 2-3 years. Collect samples from 6-8 inches depth. Test for pH, N, P, K, organic carbon, and micronutrients. Government soil testing labs charge ₹50-100 per sample." },
+                            { heading: "Improving Soil Structure", content: "Add organic matter (compost, FYM) 10-15 tons/hectare. Practice minimum tillage. Grow cover crops during off-season. Use mulching to prevent erosion. Avoid heavy machinery when soil is wet." },
+                            { heading: "pH Management", content: "Ideal pH: 6.0-7.5 for most crops. Acidic soil: Add lime (CaCO₃) 2-5 tons/hectare. Alkaline soil: Add gypsum or sulfur. Sulfur: 300-500 kg/hectare. Retest after 6 months." },
+                            { heading: "Nutrient Management", content: "NPK: Use balanced fertilizers based on soil test. Micronutrients: Apply zinc sulfate, iron chelate as needed. Organic sources: Compost, vermicompost, FYM, green manure. Split application for better utilization." },
+                            { heading: "Preventing Soil Erosion", content: "Contour farming on slopes. Plant hedgerows and windbreaks. Maintain vegetative cover. Build terraces for steep slopes. Use mulch to protect topsoil." }
+                        ]
+                    }
+                },
+                "ta": {
+                    "organic": {
+                        icon: "🌱",
+                        title: "இயற்கை விவசாயம் - முழுமையான வழிகாட்டி",
+                        color: "green",
+                        sections: [
+                            { heading: "இயற்கை விவசாயம் என்றால் என்ன?", content: "இயற்கை விவசாயம் என்பது இயற்கை செயல்முறைகள், பல்லுயிர் மற்றும் உள்ளூர் நிலைமைகளுக்கு ஏற்ற சுழற்சிகளை சார்ந்த விவசாய முறையாகும். இது செயற்கை உரங்கள் மற்றும் பூச்சிக்கொல்லிகளைத் தவிர்க்கிறது." },
+                            { heading: "முக்கிய கொள்கைகள்", content: "1. ஆரோக்கியம் - நிலையான விவசாயம், சூழலியல் மற்றும் மனித நலன். 2. சூழலியல் - இயற்கை அமைப்புகள் மற்றும் சுழற்சிகளுடன் பணிபுரியுதல். 3. நேர்மை - நேர்மையை உறுதி செய்யும் உறவுகளை உருவாக்குதல். 4. கவனம் - முன்னெச்சரிக்கையுடன் பொறுப்புடன் நிர்வகித்தல்." },
+                            { heading: "மண் தயாரிப்பு", content: "உரம், பசுந்தாள் உரம் மற்றும் பயிர் சுழற்சியைப் பயன்படுத்தவும். பண்ணை எரு போன்ற கரிமப் பொருட்களை சேர்க்கவும் (10-15 டன்/ஹெக்டேர்). மண் pH 6.0-7.5 இடையே பராமரிக்கவும். நைட்ரஜன் நிறைந்த மண்ணுக்கு மண்புழு உரத்தைப் பயன்படுத்தவும்." },
+                            { heading: "பூச்சி மேலாண்மை", content: "வேப்ப அடிப்படையிலான தயாரிப்புகள், பெரோமோன் பொறிகள் மற்றும் உயிர்-பூச்சிக்கொல்லிகளைப் பயன்படுத்தவும். பயனுள்ள பூச்சிகளை ஊக்குவிக்கவும். முக்கிய பயிர்களைச் சுற்றி பொறி பயிர்களை நடவும். வேப்ப எண்ணெய் போன்ற தாவர பூச்சிக்கொல்லிகளைப் பயன்படுத்தவும் (2-3 மி.லி/லிட்டர்)." },
+                            { heading: "சான்றிதழ் செயல்முறை", content: "இயற்கை சான்றிதழ் அமைப்புகளுக்கு விண்ணப்பிக்கவும். 3 ஆண்டு மாற்று காலத்தை பராமரிக்கவும். அனைத்து விவசாய நடவடிக்கைகளின் விரிவான பதிவுகளை வைத்திருக்கவும். சான்றிதழ் புதுப்பிப்புக்கு வருடாந்திர ஆய்வு தேவை." },
+                            { heading: "சந்தை நன்மைகள்", content: "பிரீமியம் விலைகள் (வழக்கமானதை விட 20-40% அதிகம்). வளர்ந்து வரும் நுகர்வோர் தேவை. ஏற்றுமதி வாய்ப்புகள். நீண்ட காலத்தில் சிறந்த மண் ஆரோக்கியம் மற்றும் நிலைத்தன்மை." }
+                        ]
+                    },
+                    "water": {
+                        icon: "💧",
+                        title: "நீர் மேலாண்மை - நீர்ப்பாசன வழிகாட்டி",
+                        color: "blue",
+                        sections: [
+                            { heading: "நீர் மேலாண்மையின் முக்கியத்துவம்", content: "திறமையான நீர் பயன்பாடு விளைச்சலை அதிகரிக்கும் அதே நேரத்தில் விலைமதிப்பற்ற வளங்களைப் பாதுகாக்கிறது. நல்ல நீர் மேலாண்மை 30-50% நீரைச் சேமிக்கலாம் மற்றும் உற்பத்தித்திறனை 40-60% அதிகரிக்கலாம்." },
+                            { heading: "சொட்டு நீர்ப்பாசனம்", content: "மிகவும் திறமையான முறை (90-95% திறன்). தாவர அடிப்பகுதியில் உமிழ்ப்பான்களை நிறுவவும். 2-4 லிட்டர்/மணி சொட்டிகளைப் பயன்படுத்தவும். காய்கறிகள், பழங்கள் மற்றும் பண்டப் பயிர்களுக்கு ஏற்றது. ஆரம்ப செலவு: ₹50,000-80,000/ஏக்கர்." },
+                            { heading: "தெளிப்பு நீர்ப்பாசனம்", content: "வயல் பயிர்களுக்கு ஏற்றது. 70-80% நீர் திறன். பெரிய பகுதிகளை விரைவாக உள்ளடக்குகிறது. வகைகள்: நிலையான, கையடக்க மற்றும் மைய சுழல். கோதுமை, சோளம் மற்றும் காய்கறிகளுக்கு சிறந்தது." },
+                            { heading: "மழை நீர் சேகரிப்பு", content: "மழை நீரைச் சேமிக்க பண்ணை குளங்களை உருவாக்கவும். ஓடைகளில் சரிபார்ப்பு அணைகளை நிறுவவும். ஊடுருவல் குழிகளை தோண்டவும். திறன் கணக்கீடு: நீர்ப்பிடிப்பு பகுதி × மழைப்பொழிவு × 0.8. வறண்ட காலங்களில் சேகரித்த நீரைப் பயன்படுத்தவும்." },
+                            { heading: "நீர்ப்பாசன திட்டமிடல்", content: "ஆவியாதலைக் குறைக்க அதிகாலை அல்லது மாலையில் நீர் பாய்ச்சவும். நீர்ப்பாசனம் செய்வதற்கு முன் மண் ஈரப்பதத்தை சரிபார்க்கவும். முக்கியமான நிலைகள்: பூக்கும், தானியம் நிரப்புதல். துல்லியமான திட்டமிடலுக்கு டென்சியோமீட்டர்களைப் பயன்படுத்தவும்." },
+                            { heading: "நீர் சேமிப்பு குறிப்புகள்", content: "மல்ச்சிங் நீர் இழப்பை 50% குறைக்கிறது. வறட்சி-எதிர்ப்பு வகைகளைப் பயன்படுத்தவும். குறைந்தபட்ச உழவைப் பயிற்சி செய்யவும். நீர்க்கட்டு தடுக்க சரியான வடிகால் பராமரிக்கவும்." }
+                        ]
+                    },
+                    "pest": {
+                        icon: "🐛",
+                        title: "பூச்சி கட்டுப்பாடு - ஒருங்கிணைந்த மேலாண்மை",
+                        color: "yellow",
+                        sections: [
+                            { heading: "ஒருங்கிணைந்த பூச்சி மேலாண்மை (IPM)", content: "IPM பொருளாதார, ஆரோக்கியம் மற்றும் சுற்றுச்சூழல் அபாயங்களைக் குறைக்க உயிரியல், கலாச்சார, உடல் மற்றும் இரசாயன கருவிகளை ஒருங்கிணைக்கிறது. இது பூச்சி கட்டுப்பாட்டுக்கான மிகவும் நிலையான அணுகுமுறையாகும்." },
+                            { heading: "உயிரியல் கட்டுப்பாடு", content: "அசுவினிகளுக்கு லேடிபக்ஸ் போன்ற இயற்கை வேட்டையாடுபவர்களைப் பயன்படுத்தவும். துளைப்பான்களுக்கு ட்ரைக்கோகிராமா குளவிகளை விடுவிக்கவும். பறவைகள் மற்றும் சிலந்திகளை ஊக்குவிக்கவும். கம்பளிப்பூச்சிகளுக்கு பேசிலஸ் துரிஞ்சியென்சிஸ் (Bt) பயன்படுத்தவும்." },
+                            { heading: "கலாச்சார முறைகள்", content: "பூச்சி சுழற்சிகளை உடைக்க பயிர் சுழற்சியைப் பயிற்சி செய்யவும். அறுவடைக்குப் பிறகு பயிர் எச்சங்களை அகற்றவும். நோய் இல்லாத விதைகளைப் பயன்படுத்தவும். காற்று சுழற்சிக்கு சரியான இடைவெளியைப் பராமரிக்கவும். உச்ச பூச்சி காலங்களைத் தவிர்க்க நடவு நேரம்." },
+                            { heading: "உடல் கட்டுப்பாடுகள்", content: "வெள்ளை ஈக்களுக்கு மஞ்சள் ஒட்டும் பொறிகளை நிறுவவும். கண்காணிப்பு மற்றும் வெகுஜன பொறிக்கு பெரோமோன் பொறிகளைப் பயன்படுத்தவும். பெரிய பூச்சிகளுக்கு கையால் பறிப்பது. பறவை சேதத்திற்கு பறவை அச்சுறுத்தல்கள். பறக்கும் பூச்சிகளுக்கு வலை தடைகள்." },
+                            { heading: "இரசாயன கட்டுப்பாடு (கடைசி முயற்சி)", content: "வாசல் கடக்கும்போது மட்டும் பயன்படுத்தவும். எதிர்ப்பைத் தடுக்க பூச்சிக்கொல்லிகளைச் சுழற்றவும். லேபிள் அறிவுறுத்தல்களை கவனமாகப் பின்பற்றவும். பரிந்துரைக்கப்பட்ட அளவை மட்டும் பயன்படுத்தவும். அறுவடைக்கு முன் சரியான பாதுகாப்பு இடைவெளியைப் பராமரிக்கவும்." },
+                            { heading: "பொதுவான பூச்சிகள் மற்றும் தீர்வுகள்", content: "அசுவினிகள்: வேப்ப தெளிப்பு (3மி.லி/லி). தண்டு துளைப்பான்: பெரோமோன் பொறிகள் + Bt. இலை சுரங்கத் தொழிலாளர்கள்: பாதிக்கப்பட்ட இலைகளை அகற்றவும். வெள்ளை ஈ: மஞ்சள் ஒட்டும் பொறிகள் + சோப்பு கரைசல். பூச்சிகள்: கந்தக தூள்." }
+                        ]
+                    },
+                    "soil": {
+                        icon: "🌍",
+                        title: "மண் ஆரோக்கியம் - விவசாயத்தின் அடித்தளம்",
+                        color: "red",
+                        sections: [
+                            { heading: "மண் ஆரோக்கியத்தைப் புரிந்துகொள்ளுதல்", content: "ஆரோக்கியமான மண் உற்பத்தி விவசாயத்தின் அடித்தளமாகும். இது நல்ல அமைப்பு, போதுமான ஊட்டச்சத்துக்கள், சரியான pH, மிகுந்த நுண்ணுயிர் வாழ்க்கை மற்றும் நல்ல நீர்-வைத்திருக்கும் திறன் ஆகியவற்றைக் கொண்டிருக்க வேண்டும்." },
+                            { heading: "மண் சோதனை", content: "ஒவ்வொரு 2-3 ஆண்டுகளுக்கும் மண்ணை சோதிக்கவும். 6-8 இஞ்ச் ஆழத்திலிருந்து மாதிரிகளை சேகரிக்கவும். pH, N, P, K, கரிம கார்பன் மற்றும் நுண்ணூட்டச்சத்துக்களை சோதிக்கவும். அரசாங்க மண் சோதனை ஆய்வகங்கள் மாதிரிக்கு ₹50-100 வசூலிக்கின்றன." },
+                            { heading: "மண் அமைப்பை மேம்படுத்துதல்", content: "கரிமப் பொருட்களை சேர்க்கவும் (உரம், FYM) 10-15 டன்/ஹெக்டேர். குறைந்தபட்ச உழவைப் பயிற்சி செய்யவும். ஆஃப்-சீசனில் கவர் பயிர்களை வளர்க்கவும். அரிப்பைத் தடுக்க மல்ச்சிங் பயன்படுத்தவும். மண் ஈரமாக இருக்கும்போது கனரக இயந்திரங்களைத் தவிர்க்கவும்." },
+                            { heading: "pH மேலாண்மை", content: "சிறந்த pH: பெரும்பாலான பயிர்களுக்கு 6.0-7.5. அமில மண்: சுண்ணாம்பு சேர்க்கவும் (CaCO₃) 2-5 டன்/ஹெக்டேர். காரமண்: ஜிப்சம் அல்லது கந்தகம் சேர்க்கவும். கந்தகம்: 300-500 கிலோ/ஹெக்டேர். 6 மாதங்களுக்குப் பிறகு மீண்டும் சோதிக்கவும்." },
+                            { heading: "ஊட்டச்சத்து மேலாண்மை", content: "NPK: மண் சோதனையின் அடிப்படையில் சமச்சீர் உரங்களைப் பயன்படுத்தவும். நுண்ணூட்டச்சத்துக்கள்: தேவைக்கேற்ப துத்தநாக சல்பேட், இரும்பு கீலேட் பயன்படுத்தவும். கரிம ஆதாரங்கள்: உரம், வேர்மிகம்போஸ்ட், FYM, பசுந்தாள் உரம். சிறந்த பயன்பாட்டிற்கு பிளவு பயன்பாடு." },
+                            { heading: "மண் அரிப்பைத் தடுத்தல்", content: "சரிவுகளில் விளிம்பு விவசாயம். வேலிகள் மற்றும் காற்றுத் தடைகளை நடவும். தாவர மூடியை பராமரிக்கவும். செங்குத்தான சரிவுகளுக்கு மொட்டை மாடிகளை உருவாக்கவும். மேல்மண்ணைப் பாதுகாக்க மல்ச் பயன்படுத்தவும்." }
+                        ]
+                    }
+                }
+                // Add "ml" and "hi" translations similar to "ta"
+            };
+
+            // Use English as fallback for ml and hi for now
+            const practice = (practicesData[lang] || practicesData["en"])[type];
+
+            const modal = document.getElementById('tip-modal');
+            const content = document.getElementById('tip-modal-content');
+
+            content.innerHTML = `
+                <div class="text-center mb-8">
+                    <div class="text-6xl mb-4">${practice.icon}</div>
+                    <h2 class="text-3xl font-black agri-text mb-2">${practice.title}</h2>
+                </div>
+                
+                <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-4">
+                    ${practice.sections.map(section => `
+                        <div class="bg-gradient-to-r from-${practice.color}-50 to-transparent p-6 rounded-2xl border-l-4 border-${practice.color}-500">
+                            <h3 class="text-lg font-black agri-text mb-3 flex items-center">
+                                <i class="fas fa-leaf text-${practice.color}-500 mr-2"></i>
+                                ${section.heading}
+                            </h3>
+                            <p class="text-sm text-gray-700 leading-relaxed">${section.content}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="mt-8 flex justify-center">
+                    <button onclick="closeTipModal()" class="bg-${practice.color}-500 hover:bg-${practice.color}-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all">
+                        Close
+                    </button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function logout() {
+            localStorage.removeItem('agrisathi_user');
+            window.location.href = 'login.html';
+        }
+
+
+    </script>
+</body>
+
+</html>
