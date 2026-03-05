@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,7 +20,8 @@ app.add_middleware(
 )
 
 # Mounting Static for Uploads
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+STATIC_DIR = "backend/app/static" if (os.environ.get("VERCEL") or os.environ.get("VERCEL_URL")) else "app/static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Routes
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
