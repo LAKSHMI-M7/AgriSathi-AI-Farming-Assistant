@@ -4,14 +4,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DB_FILE = "backend/agrisathi.db"
+# Get absolute path to the backend directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
+DB_FILE = os.path.join(backend_dir, "agrisathi.db")
 
 # Vercel's serverless functions are read-only except for the /tmp directory
 if os.environ.get("VERCEL") or os.environ.get("VERCEL_URL"):
     DB_FILE = "/tmp/agrisathi.db"
-    if not os.path.exists(DB_FILE) and os.path.exists("backend/agrisathi.db"):
+    if not os.path.exists(DB_FILE) and os.path.exists(os.path.join(backend_dir, "agrisathi.db")):
         try:
-            shutil.copy("backend/agrisathi.db", DB_FILE)
+            shutil.copy(os.path.join(backend_dir, "agrisathi.db"), DB_FILE)
         except Exception:
             pass
 
