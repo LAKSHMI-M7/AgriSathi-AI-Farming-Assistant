@@ -19,13 +19,19 @@ if os.environ.get("VERCEL") or os.environ.get("VERCEL_URL"):
             pass
     DB_PATH = tmp_db
 
-# Standardize path for SQLite URI (especially for Windows)
-db_uri_path = DB_PATH.replace("\\", "/")
-# For absolute paths, we need 4 slashes total: sqlite:////C:/path/to/db
-if not db_uri_path.startswith("/"):
-    db_uri_path = f"/{db_uri_path}"
-
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{db_uri_path}"
+# Handle the SQLite URI based on the platform
+if os.name == 'nt':  # Windows
+    # On Windows, absolute paths need 3 slashes: sqlite:///C:/path/to/db
+    db_uri_path = DB_PATH.replace("\\", "/")
+    if db_uri_path.startswith("/"):
+        db_uri_path = db_uri_path.lstrip("/")
+    SQLALCHEMY_DATABASE_URL = f"sqlite:///{db_uri_path}"
+else:  # Linux/Mac/Vercel
+    # On Unix, absolute paths need 4 slashes: sqlite:////tmp/db
+    db_uri_path = DB_PATH
+    if not db_uri_path.startswith("/"):
+        db_uri_path = f"/{db_uri_path}"
+    SQLALCHEMY_DATABASE_URL = f"sqlite:////{db_uri_path.lstrip('/')}"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
