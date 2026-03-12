@@ -123,7 +123,11 @@
             if (!phone || !pass) return alert("Please fill all fields");
 
             // Mock Success for Design Demo
-            const API_BASE = "";
+            
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://127.0.0.1:8001/api' 
+            : '/api';
+    
             try {
                 const res = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
